@@ -17,7 +17,7 @@ AI Explosion is coming. The AI explosion will be enabled by AI-driven AI develop
 
 ## About AI Platform
 
-At [Produvia](produvia.com), we envision an AI Platform which aims to automate AI R&D Tasks. Our vision is to create machine learning models to solve various computer science tasks. We list a few examples of AI tasks below:
+At [Produvia](https://produvia.com), we envision an AI Platform which aims to automate AI R&D Tasks. Our vision is to create machine learning models to solve various computer science tasks. We list a few examples of AI tasks below:
 
 - semantic segmentation (computer visions)
 - machine translation (natural language processing)
@@ -35,8 +35,8 @@ At [Produvia](produvia.com), we envision an AI Platform which aims to automate A
 - knowledge graphs (knowledge base)
 - adversarial attack (adversarial)
 
-> "We need to standarize AI solutions by focusing on solving AI R&D tasks while developing machine learning models that are reusable and easily accessible by all." 
-> 
+> "We need to standarize AI solutions by focusing on solving AI R&D tasks while developing machine learning models that are reusable and easily accessible by all."
+>
 > -- Slava Kurilyak, Founder / CEO at Produvia
 
 **What are we doing?**
