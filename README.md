@@ -53,10 +53,14 @@ We are using an open-source machine learning lifecycle platform, [MLflow](https:
 
 **Proposed Folder Structure:**
 
+We propose to store machine learning models using the following folder structure:
+
 `/tasks/area/task`
 
-`/tasks/computer-vision/image-classification`
-`/tasks/computer-vision/image-generation`
+For example:
+
+- [/tasks/computer-vision/image-classification](https://github.com/produvia/ai-platform/tree/master/tasks/computer-vision/image-classification)
+- [/tasks/natural-language-processing/text-classification](https://github.com/produvia/ai-platform/tree/master/tasks/natural-language-processing/text-classification)
 
 ## Get Started
 
