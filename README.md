@@ -2,9 +2,7 @@
 
 ## Background
 
-AI gig economy is coming. Many industries including Uber, DoorDash, Fiverr built an economy by relying on contingent workers, available on-demand. The great paradox of on-demand services is that they can be easily automated using artificial intelligence.
-
-AI Automation is coming. Everything that can be automated should be automated. Artificial intelligence can be automated and should be automated. Consider the following:
+Artificial intelligence (AI) gig economy is coming. Many industries including Uber, DoorDash, Fiverr built an economy by relying on contingent workers, available on-demand. The great paradox of on-demand services is that they can be easily automated using AI.
 
 - Where do AI systems come from? Research and development (R&D)
 - What do AI systems do today? Perform tasks (i.e. provide services)
@@ -13,11 +11,15 @@ AI Automation is coming. Everything that can be automated should be automated. A
 - Where does AI R&D automation lead? Recursive technology improvement
 - Where does that lead? AI services, which includes the service of developing new services
 
-AI Explosion is coming. The AI explosion will be enabled by AI-driven AI developments. As AI technology is being recursively improved, new AI services and new AI tasks will be solved.
+Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer tasks solved using AI and machine learning. Advances in AI will enable incremental speedup and automation of human tasks.
+
+> "The AI explosion will be enabled by AI-driven AI developments. As AI technologies are being recursively improved, new AI services and new AI tasks will be solved."
+>
+> -- Slava Kurilyak, Founder / CEO at Produvia
 
 ## About AI Platform
 
-At [Produvia](https://produvia.com), we envision an AI Platform which aims to automate AI R&D Tasks. Our vision is to create machine learning models to solve various computer science tasks. We list a few examples of AI tasks below:
+At [Produvia](https://produvia.com), we are developing an **AI Platform** which aims to automate AI R&D tasks. Our vision is to create machine learning models to solve various computer science tasks and achieve full AI automation. We list a few examples of AI tasks below:
 
 - semantic segmentation (computer visions)
 - machine translation (natural language processing)
@@ -39,17 +41,11 @@ At [Produvia](https://produvia.com), we envision an AI Platform which aims to au
 >
 > -- Slava Kurilyak, Founder / CEO at Produvia
 
-**What are we doing?**
-
-We are developing service-centered and technology-centered models. Service-centered models focus on completing distinct tasks while technology-centered models focus on functions. We believe advances in AI will enable incremental speedup and automation of human tasks. We are developing an AI platform to automate specific AI tasks in order to achieve full AI automation.
-
-**Where are we today?**
-
-Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer tasks solved using AI and machine learning.
-
 **What is our approach?**
 
-We are using an open-source machine learning lifecycle platform, [MLflow](https://mlflow.org/), to manage our AI tasks.
+We are developing service-centered or task-focused machine learning models. These models, or AI services, solve distinct tasks or functions.
+
+We are using an open-source machine learning lifecycle platform, [MLflow](https://mlflow.org/), to manage, improve and automate AI tasks.
 
 **Proposed Folder Structure:**
 
