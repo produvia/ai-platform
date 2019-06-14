@@ -1,0 +1,9 @@
+name: object-detection
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      photo_name: string
+    command: "python train.py {photo_name}"
