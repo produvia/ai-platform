@@ -114,7 +114,9 @@ For more information, check out documentation for the different services:
 
 AI Platform supports three programming languages:
 
-<img src="https://mlflow.org/images/integration-logos/python.png" width="125px"><img src="https://mlflow.org/images/integration-logos/r.png" width="125px"><img src="https://mlflow.org/images/integration-logos/java.png" height="80px" >
+<img src="https://mlflow.org/images/integration-logos/python.png" width="125px" alt="Python" title="Python">
+<img src="https://mlflow.org/images/integration-logos/r.png" width="125px" alt="R" title="R">
+<img src="https://mlflow.org/images/integration-logos/java.png" height="80px" alt="Java" title="Java">
 
 ## Supported ML Development Frameworks
 
@@ -124,16 +126,16 @@ AI Platform supports various machine learning frameworks and libraries:
 <img src="https://mlflow.org/images/integration-logos/pytorch.png" width="125px" alt="Pytorch" title="Pytorch">
 <img src="https://mlflow.org/images/integration-logos/keras.png" width="125px" alt="Keras" title="Keras">
 <img src="https://mlflow.org/images/integration-logos/apache-spark.png" width="125px" alt="Apache Spark" title="Apache Spark">
-<img src="https://mlflow.org/images/integration-logos/scikit-learn.png" width="125px" alt="Scikit-Learn" title="Scikit-Learn">
+<img src="https://mlflow.org/images/integration-logos/scikit-learn.png" width="125px" alt="Scikit Learn" title="Scikit Learn">
 <img src="https://mlflow.org/images/integration-logos/h2o.png" height="80px" alt="H2O" title="H2O">
 
 ## Supported ML Deployment Frameworks
 
 AI Platform supports various machine learning deployment frameworks and libraries:
 
-<img src="https://mlflow.org/images/integration-logos/conda.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/docker.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/mleap.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/sagemaker.jpg" width="125px">
-<img src="https://mlflow.org/images/integration-logos/azure-ml.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/google-cloud.png" height="80px" >
+<img src="https://mlflow.org/images/integration-logos/conda.png" width="125px" alt="Conda" title="Conda">
+<img src="https://mlflow.org/images/integration-logos/docker.png" width="125px" alt="Docker" title="Docker">
+<img src="https://mlflow.org/images/integration-logos/mleap.png" width="125px" alt="MLeap" title="Mleap">
+<img src="https://mlflow.org/images/integration-logos/sagemaker.jpg" width="125px" alt="SageMaker" title="SageMaker">
+<img src="https://mlflow.org/images/integration-logos/azure-ml.png" width="125px" alt="Azure ML" title="Azure ML">
+<img src="https://mlflow.org/images/integration-logos/google-cloud.png" height="80px" alt="Google Cloud" title="Google Cloud">
