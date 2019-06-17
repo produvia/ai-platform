@@ -104,7 +104,7 @@ For more information, check out documentation for the different services:
 
 ## Project Dependencies
 
-- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage AI tasks, record and query AI experiments and packaging format for reproducible runs on any platform. 
+- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage AI tasks, record and query AI experiments and packaging format for reproducible runs on any platform.
 
 	Familiarize yourself with MLflow by going through the following resources:
 	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
@@ -114,9 +114,7 @@ For more information, check out documentation for the different services:
 
 AI Platform supports three programming languages:
 
-<img src="https://mlflow.org/images/integration-logos/python.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/r.png" width="125px">
-<img src="https://mlflow.org/images/integration-logos/java.png" height="80px" >
+<img src="https://mlflow.org/images/integration-logos/python.png" width="125px"><img src="https://mlflow.org/images/integration-logos/r.png" width="125px"><img src="https://mlflow.org/images/integration-logos/java.png" height="80px" >
 
 ## Supported ML Development Frameworks
 
