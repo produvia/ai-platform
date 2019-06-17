@@ -4,6 +4,7 @@ channels:
 dependencies:
   - python=3.6
   - numpy=1.16.4
+  - pip
   - pip:
     - tensorflow>=1.13.1
     - keras>=2.2.4
