@@ -100,11 +100,42 @@ When you are ready to merge your feature branch back into `master`:
 
 For more information, check out documentation for the different services:
 
-- [tasks](/tasks/README.md) - for compilation of AI tasks
+- [/tasks](/tasks/README.md) - for compilation of AI tasks
 
 ## Project Dependencies
 
-- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage all AI tasks. Familiarize yourself with MLflow by going through the following resources:
+- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage AI tasks, record and query AI experiments and packaging format for reproducible runs on any platform. 
 
+	Familiarize yourself with MLflow by going through the following resources:
 	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
 	2. Watch [34-minute video](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
+
+## Supported Programming Languages
+
+AI Platform supports three programming languages:
+
+<img src="https://mlflow.org/images/integration-logos/python.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/r.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/java.png" height="80px" >
+
+## Supported ML Development Frameworks
+
+AI Platform supports various machine learning frameworks and libraries:
+
+<img src="https://mlflow.org/images/integration-logos/tensorflow.png" width="125px" alt="Tensorflow" title="Tensorflow">
+<img src="https://mlflow.org/images/integration-logos/pytorch.png" width="125px" alt="Pytorch" title="Pytorch">
+<img src="https://mlflow.org/images/integration-logos/keras.png" width="125px" alt="Keras" title="Keras">
+<img src="https://mlflow.org/images/integration-logos/apache-spark.png" width="125px" alt="Apache Spark" title="Apache Spark">
+<img src="https://mlflow.org/images/integration-logos/scikit-learn.png" width="125px" alt="Scikit-Learn" title="Scikit-Learn">
+<img src="https://mlflow.org/images/integration-logos/h2o.png" height="80px" alt="H2O" title="H2O">
+
+## Supported ML Deployment Frameworks
+
+AI Platform supports various machine learning deployment frameworks and libraries:
+
+<img src="https://mlflow.org/images/integration-logos/conda.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/docker.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/mleap.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/sagemaker.jpg" width="125px">
+<img src="https://mlflow.org/images/integration-logos/azure-ml.png" width="125px">
+<img src="https://mlflow.org/images/integration-logos/google-cloud.png" height="80px" >
