@@ -59,10 +59,10 @@
         },
         "databricks-cli": {
             "hashes": [
-                "sha256:9db04827ded11313892b7f190f95af00677b91743c4b7009e1094f7f1ffc6bc7",
-                "sha256:e61f441e6ed74440cc320db4c5c84b866298f4ffc6450c16f2af2bee72b44882"
+                "sha256:1935207354f548d0e28a1bde4998310b5606b75f23e114de37f40c97b98fac91",
+                "sha256:8b3d75feb191f6aace610a5d0e43441ab19a4812a23fbdd367162cababa446b5"
             ],
-            "version": "==0.8.6"
+            "version": "==0.8.7"
         },
         "docker": {
             "hashes": [
