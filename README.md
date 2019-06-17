@@ -55,11 +55,56 @@ We propose to store machine learning models using the following folder structure
 
 For example:
 
-- [/tasks/computer-vision/image-classification](https://github.com/produvia/ai-platform/tree/master/tasks/computer-vision/image-classification)
-- [/tasks/natural-language-processing/text-classification](https://github.com/produvia/ai-platform/tree/master/tasks/natural-language-processing/text-classification)
+`/tasks/computer-vision/image-classification`
 
-## Get Started
+## Installation
 
-1. Clone this repo and review the `examples` folder.
+To get the entire project up and running locally:
 
-2. When you want to contribute, solve one specific AI task using [MLflow](https://mlflow.org/) and issue a [new pull request](https://github.com/produvia/ai-platform/pulls).
+Clone the repo:
+
+```
+$ git clone https://github.com/produvia/ai-platform.git
+$ cd ai-platform
+```
+
+## Running Locally
+
+This is an example of how to run `object detection` on the picture containing zebra:
+
+```
+$ cd tasks/computer-vision/object-detection/
+$ mlflow run . -P photo_name=zebra.jpg
+```
+
+## Contributing
+
+When contributing to the codebase, please create a new feature branch:
+
+```
+$ git checkout -b feature/<YOUR_FEATURE_NAME>
+```
+
+To push your latest changes to the repo:
+
+```
+$ git push origin feature<YOUR_FEATURE_BRANCH>
+```
+
+When you are ready to merge your feature branch back into `master`:
+
+1. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
+2. Submit a pull request to the `master` branch
+
+## Project Components
+
+For more information, check out documentation for the different services:
+
+- [tasks](/tasks/README.md) - for compilation of AI tasks
+
+## Project Dependencies
+
+- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage all AI tasks. Familiarize yourself with MLflow by going through the following resources:
+
+	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
+	2. Watch [34-minute video](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
