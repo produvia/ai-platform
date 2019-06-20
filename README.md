@@ -114,7 +114,7 @@ For more information, check out documentation for the different services:
 
 AI Platform supports three programming languages:
 
-<img src="https://mlflow.org/images/integration-logos/python.png" width="125px" alt="Python" title="Python"> <img src="https://mlflow.org/images/integration-logos/r.png" width="125px" alt="R" title="R"> <img src="https://mlflow.org/images/integration-logos/java.png" height="80px" alt="Java" title="Java">
+<a href="https://www.python.org/"><img src="https://mlflow.org/images/integration-logos/python.png" width="125px" alt="Python" title="Python"></a> <img src="https://mlflow.org/images/integration-logos/r.png" width="125px" alt="R" title="R"> <img src="https://mlflow.org/images/integration-logos/java.png" height="80px" alt="Java" title="Java">
 
 ## Supported ML Development Frameworks
 
