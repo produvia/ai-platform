@@ -112,7 +112,7 @@ For more information, check out documentation for the different services:
 
 ## Supported Programming Languages
 
-AI Platform supports three programming languages:
+AI Platform supports various programming languages:
 
 <a href="https://www.python.org/"><img src="https://mlflow.org/images/integration-logos/python.png" width="125px" alt="Python" title="Python"></a> <a href="https://www.r-project.org/"><img src="https://mlflow.org/images/integration-logos/r.png" width="125px" alt="R" title="R"></a> <a href="https://en.wikipedia.org/wiki/Java_(programming_language)"><img src="https://mlflow.org/images/integration-logos/java.png" height="80px" alt="Java" title="Java"></a>
 
