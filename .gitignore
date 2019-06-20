@@ -2,3 +2,6 @@ model.h5
 yolov3.weights
 mlruns/
 .vscode
+__pycache__/
+*.jpg
+*.jpeg

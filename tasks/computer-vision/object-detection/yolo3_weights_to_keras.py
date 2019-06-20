@@ -1,9 +1,14 @@
 # Download and create a YOLOv3 Keras model and save it to file
 # Credit Jason Brownlee, https://machinelearningmastery.com/how-to-perform-object-detection-with-yolov3-in-keras/
 
+from download_file import download_if_not_exists
+import os.path
+import sys
 import urllib.request
 import struct
 import numpy as np
+import mlflow
+import mlflow.keras
 from keras.layers import Conv2D
 from keras.layers import Input
 from keras.layers import BatchNormalization
@@ -12,11 +17,6 @@ from keras.layers import ZeroPadding2D
 from keras.layers import UpSampling2D
 from keras.layers.merge import add, concatenate
 from keras.models import Model
-
-
-print('Downloading yolo3 darknet weights...\n')
-url = 'https://pjreddie.com/media/files/yolov3.weights'  
-urllib.request.urlretrieve(url, 'yolov3.weights')  
 
 
 def _conv_block(inp, convs, skip=True):
@@ -163,13 +163,22 @@ class WeightReader:
 	def reset(self):
 		self.offset = 0
 
-print('Converting yolo3 darknet weights to .h5 format...\n')
+if __name__ == "__main__":
+	darknet_model_path = sys.argv[1] if len(sys.argv) > 1 else 'https://pjreddie.com/media/files/yolov3.weights'
+	darknet_model = 'yolov3.weights'
+	download_if_not_exists(darknet_model,darknet_model_path)
 
-# define the model
-model = make_yolov3_model()
-# load the model weights
-weight_reader = WeightReader('yolov3.weights')
-# set the model weights into the model
-weight_reader.load_weights(model)
-# save the model to file
-model.save('model.h5')
+	keras_model = 'model.h5'
+	print("Converting Yolo3 darknet model into keras model", keras_model)		
+	# define the model
+	model = make_yolov3_model()
+	# load the model weights
+	weight_reader = WeightReader(darknet_model)
+	# set the model weights into the model
+	weight_reader.load_weights(model)
+	# save the model to file
+	model.save(keras_model)
+
+	with mlflow.start_run():
+		mlflow.log_param("darknet_model_path", darknet_model_path)
+		mlflow.keras.log_model(model, keras_model)
