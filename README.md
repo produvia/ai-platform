@@ -45,8 +45,6 @@ At [Produvia](https://produvia.com), we are developing an **AI Platform** which 
 
 We are developing service-centered or task-focused machine learning models. These models, or AI services, solve distinct tasks or functions.
 
-We are using an open-source machine learning lifecycle platform, [MLflow](https://mlflow.org/), to manage, improve and automate AI tasks.
-
 **Proposed Folder Structure:**
 
 We propose to store machine learning models using the following folder structure:
@@ -104,11 +102,12 @@ For more information, check out documentation for the different services:
 
 ## Project Dependencies
 
-- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to manage AI tasks, record and query AI experiments and packaging format for reproducible runs on any platform.
+- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to track and manage machine learning models.
 
 	Familiarize yourself with MLflow by going through the following resources:
 	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
-	2. Watch [34-minute video](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
+	2. Watch [MLflow introduction video](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
+	3. Watch [MLflow on YouTube](https://www.youtube.com/playlist?list=PLTPXxbhUt-YVstcW1-OrYoRiAipXRManO)
 
 ## Supported Programming Languages
 
@@ -127,3 +126,29 @@ AI Platform supports various machine learning frameworks and libraries:
 AI Platform supports various machine learning deployment frameworks and libraries:
 
 <a href="https://conda.io"><img src="https://mlflow.org/images/integration-logos/conda.png" width="125px" alt="Conda" title="Conda"></a> <a href="https://www.docker.com/"><img src="https://mlflow.org/images/integration-logos/docker.png" width="125px" alt="Docker" title="Docker"></a> <a href="http://mleap-docs.combust.ml/"><img src="https://mlflow.org/images/integration-logos/mleap.png" width="125px" alt="MLeap" title="Mleap"></a> <a href="https://aws.amazon.com/sagemaker/"><img src="https://mlflow.org/images/integration-logos/sagemaker.jpg" width="125px" alt="SageMaker" title="SageMaker"></a> <a href="https://azure.microsoft.com/en-ca/services/machine-learning-service/"><img src="https://mlflow.org/images/integration-logos/azure-ml.png" width="125px" alt="Azure ML" title="Azure ML"></a> <a href="https://cloud.google.com/"><img src="https://mlflow.org/images/integration-logos/google-cloud.png" height="80px" alt="Google Cloud" title="Google Cloud"></a>
+
+## Common Questions
+
+### What is the difference between AI Platform and MLflow?
+
+AI Platform is an open source platform for machine learning tasks while MLflow is open source platform for the machine learning lifecycle. AI Platform focuses on automating AI tasks while MLflow focuses on tracking tasks, packaging tasks and deploying tasks. AI Platform is dependent on MLflow. MLflow is not dependent on AI Platform.
+
+AI Platform:
+
+> AI Platform Tasks: Automate computer science tasks using AI, machine learning, deep learning and data science.
+
+MLflow:
+
+> MLflow Tracking: An API to log parameters, code, and results in machine learning experiments and compare them using an interactive UI.
+>
+> MLflow Projects: A code packaging format for reproducible runs using Conda and Docker, so you can share your ML code with others.
+>
+> MLflow Models: A model packaging format and tools that let you easily deploy the same model (from any ML library) to batch and real-time scoring on platforms such as Docker, Apache Spark, Azure ML and AWS SageMaker.
+
+### What is the difference between AI Platform and AutoML?
+
+At Produvia, AI Platform aims to make machine learning models reusable and easily accessible by all.
+
+AutoML aims to "make machine learning more accessible by automatically generating a data analysis pipeline that can include data pre-processing, feature selection, and feature engineering methods along with machine learning methods and parameter settings that are optimized for your data." ([AutoML.info, 2019](http://automl.info/))
+
+At Google, AutoML aims to "make AI accessible to every business". ([Google, 2019](https://cloud.google.com/blog/topics/inside-google-cloud/cloud-automl-making-ai-accessible-every-business))
