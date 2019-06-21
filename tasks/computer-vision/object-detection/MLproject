@@ -3,7 +3,16 @@ name: object-detection
 conda_env: conda.yaml
 
 entry_points:
-  main:
+  yolo3_weights_to_keras:
     parameters:
-      photo_name: string
-    command: "python train.py {photo_name}"
+      darknet_model_path: {type: string, default: 'https://pjreddie.com/media/files/yolov3.weights'}
+    command: "python yolo3_weights_to_keras.py {darknet_model_path}"
+
+  train:
+    parameters:
+      keras_model_path: {type: string, default: 'model.h5'}
+      photo_name: {type: string, default: 'zebra.jpg'}
+    command: "python train.py {keras_model_path} {photo_name}"
+
+  main:
+    command: "python main.py"
