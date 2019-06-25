@@ -19,6 +19,8 @@ Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer ta
 
 ## About AI Platform
 
+![ai-platform](ai-platform.jpg)
+
 At [Produvia](https://produvia.com), we are developing an **AI Platform** which aims to automate AI R&D tasks. Our vision is to create machine learning models to solve various computer science tasks and achieve full AI automation. We list a few examples of AI tasks below:
 
 - semantic segmentation (computer visions)
@@ -98,16 +100,16 @@ When you are ready to merge your feature branch back into `master`:
 
 For more information, check out documentation for the different services:
 
-- [/tasks](/tasks/README.md) - for compilation of AI tasks
+- [/tasks](https://github.com/produvia/ai-platform/tree/master/tasks) - for compilation of AI tasks
 
 ## Project Dependencies
 
-- [MLflow](https://github.com/mlflow/mlflow) - an open source platform for machine learning lifecycle. We use MLflow to track and manage machine learning models.
+![ai-platform-mlflow](ai-platform-mlflow.jpg)
 
-	Familiarize yourself with MLflow by going through the following resources:
+- We use [MLflow](https://github.com/mlflow/mlflow) for model tracking and model deployment. MLflow is an open source platform for machine learning lifecycle. Familiarize yourself with MLflow by going through the following resources:
 	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
-	2. Watch [MLflow introduction video](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
-	3. Watch [MLflow on YouTube](https://www.youtube.com/playlist?list=PLTPXxbhUt-YVstcW1-OrYoRiAipXRManO)
+	2. Watch [MLflow intro video on YouTube](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
+	3. Watch [MLflow videos on YouTube](https://www.youtube.com/playlist?list=PLTPXxbhUt-YVstcW1-OrYoRiAipXRManO)
 
 ## Supported Programming Languages
 
@@ -131,7 +133,7 @@ AI Platform supports various machine learning deployment frameworks and librarie
 
 ### What is the difference between AI Platform and MLflow?
 
-AI Platform is an open source platform for machine learning tasks while MLflow is open source platform for the machine learning lifecycle. AI Platform focuses on automating AI tasks while MLflow focuses on tracking tasks, packaging tasks and deploying tasks. AI Platform is dependent on MLflow. MLflow is not dependent on AI Platform.
+AI Platform is an open source platform for automating machine learning models (aka tasks) while MLflow is open source platform for the machine learning lifecycle. AI Platform focuses on automating tasks while MLflow focuses on managing and deploying models. AI Platform focuses on automating model building. MLflow focuses on automating post-modeling. AI Platform is dependent on MLflow. MLflow is not dependent on AI Platform. 
 
 AI Platform:
 
@@ -139,16 +141,16 @@ AI Platform:
 
 MLflow:
 
-> MLflow Tracking: An API to log parameters, code, and results in machine learning experiments and compare them using an interactive UI.
+> MLflow Tracking: Log parameters, code, and results in machine learning experiments and compare them using an interactive UI.
 >
 > MLflow Projects: A code packaging format for reproducible runs using Conda and Docker, so you can share your ML code with others.
 >
 > MLflow Models: A model packaging format and tools that let you easily deploy the same model (from any ML library) to batch and real-time scoring on platforms such as Docker, Apache Spark, Azure ML and AWS SageMaker.
 
-### What is the difference between AI Platform and AutoML?
-
-At Produvia, AI Platform aims to make machine learning models reusable and easily accessible by all.
+### What is the difference between AutoML and AI Platform?
 
 AutoML aims to "make machine learning more accessible by automatically generating a data analysis pipeline that can include data pre-processing, feature selection, and feature engineering methods along with machine learning methods and parameter settings that are optimized for your data." ([AutoML.info, 2019](http://automl.info/))
 
 At Google, AutoML aims to "make AI accessible to every business". ([Google, 2019](https://cloud.google.com/blog/topics/inside-google-cloud/cloud-automl-making-ai-accessible-every-business))
+
+At [Produvia](https://produvia.com), AI Platform aims to make machine learning models reusable and easily accessible by all.
