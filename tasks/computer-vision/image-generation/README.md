@@ -1,1 +1,1 @@
-# Image Generation Task
+# Image Generation
