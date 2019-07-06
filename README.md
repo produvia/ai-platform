@@ -17,7 +17,7 @@ Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer ta
 >
 > -- Slava Kurilyak, Founder / CEO at Produvia
 
-## About AI Platform
+## About
 
 ![ai-platform](ai-platform.jpg)
 
@@ -77,25 +77,6 @@ $ cd tasks/computer-vision/object-detection/
 $ mlflow run . -P photo_name=zebra.jpg
 ```
 
-## Contributing
-
-When contributing to the codebase, please create a new feature branch:
-
-```
-$ git checkout -b feature/<YOUR_FEATURE_NAME>
-```
-
-To push your latest changes to the repo:
-
-```
-$ git push origin feature<YOUR_FEATURE_BRANCH>
-```
-
-When you are ready to merge your feature branch back into `master`:
-
-1. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
-2. Submit a pull request to the `master` branch
-
 ## Project Components
 
 For more information, check out documentation for the different services:
@@ -133,7 +114,7 @@ AI Platform supports various machine learning deployment frameworks and librarie
 
 ### What is the difference between AI Platform and MLflow?
 
-AI Platform is an open source platform for automating machine learning models (aka tasks) while MLflow is open source platform for the machine learning lifecycle. AI Platform focuses on automating tasks while MLflow focuses on managing and deploying models. AI Platform focuses on automating model building. MLflow focuses on automating post-modeling. AI Platform is dependent on MLflow. MLflow is not dependent on AI Platform. 
+AI Platform is an open source platform for automating machine learning models (aka tasks) while MLflow is open source platform for the machine learning lifecycle. AI Platform focuses on automating tasks while MLflow focuses on managing and deploying models. AI Platform focuses on automating model building. MLflow focuses on automating post-modeling. AI Platform is dependent on MLflow. MLflow is not dependent on AI Platform.
 
 AI Platform:
 
@@ -154,3 +135,46 @@ AutoML aims to "make machine learning more accessible by automatically generatin
 At Google, AutoML aims to "make AI accessible to every business". ([Google, 2019](https://cloud.google.com/blog/topics/inside-google-cloud/cloud-automl-making-ai-accessible-every-business))
 
 At [Produvia](https://produvia.com), AI Platform aims to make machine learning models reusable and easily accessible by all.
+
+I agree with you in that requiring S3 distributed storage is not a requirement, but a recommendation. As long we keep an eye on the repository size, using `git-sizer` (https://github.com/github/git-sizer) or similar tools, we'll be in good shape.
+
+We can include a brief note on datasets, such as:
+
+## Datasets
+
+### Uploading Your Own Dataset
+
+Do you have your own data? We recommend that you upload your own dataset onto a public bucket via [AWS S3](https://aws.amazon.com/s3) and include a `LICENSE` file which describes commercial or non-commercial rights.
+
+### Finding an Existing Dataset
+
+Are you looking for a dataset? We recommend that you check out [DataSetList.com](https://www.datasetlist.com/) which includes biggest machine learning datasets for computer vision (CV), natural language processing (NLP), question answer (QA), audio, and medical industries.
+
+## Contributing
+
+### Code
+
+When contributing to the codebase, please create a new feature branch:
+
+```
+$ git checkout -b feature/<YOUR_FEATURE_NAME>
+```
+
+To push your latest changes to the repo:
+
+```
+$ git push origin feature<YOUR_FEATURE_BRANCH>
+```
+
+When you are ready to merge your feature branch back into `master`:
+
+1. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
+2. Submit a pull request to the `master` branch
+
+### Ideas
+
+Do you have an idea on how we can improve **AI Platform**? Email us at [hello@produvia.com](mailto:hello@produvia.com)
+
+## About Produvia
+
+AI Platform was launched by the Produvia team. Since 2013, [Produvia](http://produvia.com) has partnered with companies from all industries to accelerate the adoption of AI and machine learning technologies.
