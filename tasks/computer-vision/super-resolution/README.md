@@ -26,7 +26,7 @@ List of parameters:
   
 #### Command:    
 
-mlflow run . -e train -P data_path='/training_data/' -P size=512 -P factor=2 -P bs=10 -P epochs=20 -P device='cpu' 
+mlflow run . -e train -P data_path='/training_data/' -P size=512 -P factor=2 -P bs=10 -P epochs=20 -P load=True -P device='cpu' 
 
 ### Super Resolution
 
