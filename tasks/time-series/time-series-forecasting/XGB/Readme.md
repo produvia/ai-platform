@@ -4,7 +4,7 @@ Irish electricity consumption forecasting for the next 7-days using XGBoost.
 
 **Data**
 
-Data contains electricty consumption measurements for 15-min intervals from March, 2011 to February 2013.
+Data contains electricity consumption measurements for 15-min intervals from March, 2011 to February 2013.
 
 Source : [data.gov.ie](https://data.gov.ie/dataset/energy-consumption-gas-and-electricity-civic-offices-2009-2012/resource/6091c604-8c94-4b44-ac52-c1694e83d746)
 
@@ -12,6 +12,8 @@ To download: https://data.smartdublin.ie/dataset/10130831-d2a5-4f4f-b56b-03d8e2c
 
 **Requirements**
 * xgboost
+* scikit-learn
+* matplotlib
 
 
 
