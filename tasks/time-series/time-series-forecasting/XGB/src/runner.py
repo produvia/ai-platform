@@ -4,7 +4,6 @@ import io
 import requests
 from datetime import timedelta
 import xgboost as xgb
-import pickle
 from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import *
 import matplotlib.pyplot as plt
@@ -126,7 +125,7 @@ class ForecastRunner(object):
         bst = xgb.train(dtrain=xgbtrain, params=param)
 
         # save model to file
-        pickle.dump(bst, open("forecast.pickle.dat", "wb"))
+        mlflow.sklearn.save_model(bst, "model")
         return df_test
 
     def predict(self, df_test):
@@ -134,7 +133,7 @@ class ForecastRunner(object):
          Makes prediction for the next 7 days electricity consumption.
         """
         # load model from file
-        loaded_model = pickle.load(open("forecast.pickle.dat", "rb"))
+        loaded_model = mlflow.sklearn.load_model("model")
         # make predictions for test data
         xts, yts = df_test.drop(['Value'], axis=1), df_test['Value'].values
         p = loaded_model.predict(xgb.DMatrix(xts))
