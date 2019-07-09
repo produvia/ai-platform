@@ -150,7 +150,7 @@ class Network(nn.Module):
         optim_state = copy.deepcopy(self.optimizer.state_dict())
         optimizer = self.optimizer
         criterion = self.criterion
-        num = len(trn_loader)-1
+        num = min(1,len(trn_loader)-1)
         mult = (final_value / init_value) ** (1/num)
         lr = init_value
         optimizer.param_groups[0]['lr'] = lr
