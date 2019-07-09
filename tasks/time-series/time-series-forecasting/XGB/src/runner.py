@@ -20,6 +20,7 @@ class ForecastRunner(object):
         df = pd.read_csv(io.StringIO(s.decode('utf-8')), header=1)
         # sum along 15-min intervals and convert into daily values
         df['Value'] = df.drop(['Date', 'Values'], axis=1).sum(axis=1)
+        df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
         input_data = df[['Date', 'Value']]
         return input_data
 
@@ -30,7 +31,7 @@ class ForecastRunner(object):
         prediction.to_csv(self.output_file)
 
     @staticmethod
-    def remove_outliers(data, threshold=3.5, fill=False):
+    def remove_outliers(data, fill=False, threshold=3.5):
         """
         Median Absolute Deviation (MAD) based outlier detection
         Removes outliers and if selected fills with polynomial  interpolation
@@ -51,10 +52,7 @@ class ForecastRunner(object):
         return data
 
     def prepare_data(self, df, fill=False):
-        df['Date'] = pd.to_datetime(df['Date'], format='%d/%m/%Y')
         df = df.set_index('Date')
-        # remove outliers
-        df = ForecastRunner.remove_outliers(df, fill)
         # get time features
         df['Year'] = df.index.year
         df['Month'] = df.index.month
@@ -69,13 +67,15 @@ class ForecastRunner(object):
         weekly_avg = dict(df.groupby('Week')['Value'].mean())
         df['week_avg'] = df['Week'].apply(lambda x: weekly_avg[x])
         dow_avg = dict(df.groupby('DOW')['Value'].mean())
-        df['dow'] = df['DOW'].apply(lambda x: dow_avg[x])
+        df['dow_avg'] = df['DOW'].apply(lambda x: dow_avg[x])
 
         df = df.drop(['Year', 'Month', 'Week', 'DOW'], axis=1)
         start_date = pd.to_datetime(self.predicted_date).date()
         end_date = start_date + timedelta(days=6)
 
         train = df.loc[df.index.date < start_date]
+        # remove outliers from training set
+        train = ForecastRunner.remove_outliers(train, fill)
         test = df.loc[(df.index.date >= start_date) & (df.index.date <= end_date)]
         return train, test
 
