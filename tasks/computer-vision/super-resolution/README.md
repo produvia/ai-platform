@@ -16,7 +16,7 @@ Download the whole folders 'pretrained_super_res_f4' and 'pretrained_super_res_f
 
 List of parameters: 
 
-  data_path: Directory of training images. Make sure to keep all images in a folder named 'train' before running script. e.g. if images are in '/training_data/train/', data_path = '/training_data/'  
+  data_path: Full path to the directory of training images. Make sure to keep all images in a folder named 'train' before running script. e.g. if images are in '/training_data/train/', data_path = '/training_data/'.  
   
   size: Size of final image after super resolution. (Default = 400)  
   
