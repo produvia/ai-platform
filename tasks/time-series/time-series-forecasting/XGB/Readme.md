@@ -17,7 +17,6 @@ Source : [data.gov.ie](https://data.gov.ie/dataset/energy-consumption-gas-and-el
 
 **Example run**
 
-Usage: python main.py <source_url> <output_file> <predicted_date>
-
-Example: python main.py url.csv ../output.csv 2013-01-07
-
+Usage: python main.py --url {url} --output_file {output_file} --predicted_date {predicted_date}
+    --min_child_weight {min_child_weight} --colsample_bytree {colsample_bytree} --max_depth {max_depth}
+    --n_estimators {n_estimators} --eval_metric {eval_metric}
