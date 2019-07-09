@@ -1,0 +1,10 @@
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      url: url
+      output_file: path
+      predicted_date: string
+
+    command: python main.py --url {url} --output_file {output_file} --predicted_date {predicted_date}
