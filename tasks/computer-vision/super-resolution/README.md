@@ -30,7 +30,7 @@ List of parameters:
   
   load_path: Directory where MLflow has saved a previous model for loading later. MLflow will save the models you train in 'mlflow_saved_traing_models'. (Default = '', so it will load from 'mlflow_pretrained_models/pretrained_super_res_f2' by default.)   
   
-  device: Device to run the code on ('cpu', 'cuda', 'cuda:0' etc.) (Default = 'cpu') 
+  device: Device to run the code on ('cpu', 'cuda', 'cuda:0' etc.) (Default = 'cpu')
   
 #### Command:    
 
@@ -53,3 +53,11 @@ List of parameters:
 #### Command:    
 
 mlflow run . -e super_res -P input_path='example_input.png' -P factor=2 -P device='cpu'
+
+### Important Note:
+  
+The model itself is quite big and super resolution is a memory heavy task.  
+In my experiments while training on an 8GB GPU, I was unable to go beyond a batch size of 8-10 with parameter size=300 without my GPU going out of memory.  
+Factor 2 will generally require a bit more memory than factor 4, so in my case if factor 2 can have bs=8, factor 4 could have bs=10.  
+
+For super resolution, low resolution images smaller than 720 work just fine.
