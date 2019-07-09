@@ -95,8 +95,7 @@ class ForecastRunner(object):
         test = df.loc[(df.index.date >= start_date) & (df.index.date <= end_date)]
         return train, test
 
-    @staticmethod
-    def grid_search(xtr, ytr):
+    def grid_search(self, xtr, ytr):
         gbm = xgb.XGBRegressor()
         reg_cv = GridSearchCV(gbm,
                               {"colsample_bytree": self.colsample_bytree, "min_child_weight": self.min_child_weight,
@@ -122,7 +121,7 @@ class ForecastRunner(object):
         xtr, ytr = df_train.drop(['Value'], axis=1), df_train['Value'].values
 
         xgbtrain = xgb.DMatrix(xtr, ytr)
-        reg_cv = ForecastRunner.grid_search(xtr, ytr)
+        reg_cv = self.grid_search(xtr, ytr)
         param = reg_cv.best_params_
         bst = xgb.train(dtrain=xgbtrain, params=param)
 
