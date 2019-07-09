@@ -8,6 +8,7 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.metrics import *
 import matplotlib.pyplot as plt
 import mlflow
+import mlflow.sklearn
 
 
 class ForecastRunner(object):
