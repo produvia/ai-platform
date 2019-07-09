@@ -44,6 +44,7 @@ else:
     load_model_path = models[upscale_factor]['best_model_folder']
 
 net = mlflow.pytorch.load_model(load_model_path,map_location='cpu')
+net.device = device
 net = net.to(device)
 net.eval()
 sr = net(batch)
