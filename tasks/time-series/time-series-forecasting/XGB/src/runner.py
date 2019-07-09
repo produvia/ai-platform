@@ -6,7 +6,9 @@ from datetime import timedelta
 import xgboost as xgb
 import pickle
 from sklearn.model_selection import GridSearchCV
+from sklearn.metrics import *
 import matplotlib.pyplot as plt
+import mlflow
 
 
 class ForecastRunner(object):
@@ -29,6 +31,14 @@ class ForecastRunner(object):
         df_test = test.reset_index()[['Date']]
         prediction = df_test.join(preds)
         prediction.to_csv(self.output_file)
+        
+    @staticmethod
+    def evaluation_metrics(y_true, y_pred):
+        mape = np.mean(np.abs((np.array(y_true) - np.array(y_pred)) / np.array(y_true))) * 100
+        rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+        mae = mean_absolute_error(y_true, y_pred)
+        r2 = r2_score(y_true, y_pred)
+        return mape, rmse, mae, r2
 
     @staticmethod
     def remove_outliers(data, fill=False, threshold=3.5):
@@ -88,11 +98,6 @@ class ForecastRunner(object):
         return reg_cv
 
     @staticmethod
-    def mean_absolute_percentage_error(y_true, y_pred):
-        y_true, y_pred = np.array(y_true), np.array(y_pred)
-        return np.mean(np.abs((y_true - y_pred) / y_true)) * 100
-
-    @staticmethod
     def plot_result(y_true, y_pred):
         plt.plot(y_true, label='Actual')
         plt.plot(y_pred, label='Predicted')
@@ -127,7 +132,15 @@ class ForecastRunner(object):
         xts, yts = df_test.drop(['Value'], axis=1), df_test['Value'].values
         p = loaded_model.predict(xgb.DMatrix(xts))
         prediction = pd.DataFrame({'Prediction': p})
-        mape = ForecastRunner.mean_absolute_percentage_error(yts, p)
+        
+        mape, rmse, mae, r2 = ForecastRunner.evaluation_metrics(yts, p)
         print('MAPE: {}'.format(mape))
+        print('RMSE: {}'.format(rmse))
+        print('R2: {}'.format(mae))
+        print('MAE: {}'.format(r2))
+        mlflow.log_metric("MAPE", mape)
+        mlflow.log_metric("RMSE", rmse)
+        mlflow.log_metric("R2", r2)
+        mlflow.log_metric("MAE", mae)
         ForecastRunner.plot_result(yts, p)
         self.save_output(df_test, prediction)
