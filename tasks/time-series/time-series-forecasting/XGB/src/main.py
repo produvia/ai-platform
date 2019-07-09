@@ -8,14 +8,20 @@ URL = 'https://data.smartdublin.ie/dataset/10130831-d2a5-4f4f-b56b-03d8e2cc56c8/
 
 @click.command()
 @click.option("--url", default=URL)
-@click.option("--output_file", default='output/output.csv')
+@click.option("--output_file", default='../output/output.csv')
 @click.option("--predicted_date", default='2013-01-07')
-def main(url, output_file, predicted_date):
-    model = ForecastRunner(url, output_file, predicted_date)
+@click.option("--min_child_weight", default=[0.8,1.2])
+@click.option("--colsample_bytree", default=[0.9])
+@click.option("--max_depth", default=[3, 4, 6])
+@click.option("--n_estimators", default=[500, 1000])
+@click.option("--eval_metric", default=['rmse'])
+def main(url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators,
+                 eval_metric):
+    model = ForecastRunner(url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators,
+                 eval_metric)
     df_test = model.fit()
     model.predict(df_test)
 
 
 if __name__ == '__main__':
     main()
-
