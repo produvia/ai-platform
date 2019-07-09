@@ -6,5 +6,23 @@ entry_points:
       url: url
       output_file: path
       predicted_date: string
+      min_child_weight:
+        type: list
+        default: [0.8, 1.2]
+      colsample_bytree:
+        type: list
+        default: [0.9]
+      max_depth:
+        type: list
+        default: [3, 4, 6]
+      n_estimators:
+        type: list
+        default: [500, 1000]
+      eval_metric:
+        type: list
+        default: ['rmse']
+
 
     command: python main.py --url {url} --output_file {output_file} --predicted_date {predicted_date}
+    --min_child_weight {min_child_weight} --colsample_bytree {colsample_bytree} --max_depth {max_depth}
+    --n_estimators {n_estimators} --eval_metric {eval_metric}
