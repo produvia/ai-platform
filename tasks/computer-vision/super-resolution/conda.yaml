@@ -1,0 +1,24 @@
+name: produvia_env
+channels:
+  - pytorch
+  - conda-forge
+  - anaconda
+  - defaults
+dependencies:
+  - cloudpickle=0.6.1=py37_0
+  - conda-verify=3.1.1=py37_0
+  - cudatoolkit=9.0=h13b8566_0
+  - cudnn=7.3.1=cuda9.0_0
+  - pytorch=1.0.1=py3.7_cuda9.0.176_cudnn7.4.2_2
+  - scikit-image
+  - scikit-learn
+  - torchvision=0.2.2=py_3
+  - python=3.7.1
+  - pip=19.1.1
+  - pip:
+    - mlflow==1.0.0
+    - opencv-contrib-python==4.1.0.25
+    - pandas==0.24.2
+    - pandas-summary==0.0.6
+    - pip==19.1.1
+    - sklearn-pandas==1.8.0
