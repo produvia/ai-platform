@@ -2,7 +2,7 @@
 
 ## Background
 
-Artificial intelligence (AI) gig economy is coming. Many industries including Uber, DoorDash, Fiverr built an economy by relying on contingent workers, available on-demand. The great paradox of on-demand services is that they can be easily automated using AI.
+Artificial intelligence (AI) gig economy is here. Many companies including Uber, DoorDash, Fiverr built economies by relying on contingent workers, available on-demand. The great paradox of on-demand services is that they can be easily automated using AI technologies.
 
 - Where do AI systems come from? Research and development (R&D)
 - What do AI systems do today? Perform tasks (i.e. provide services)
@@ -10,8 +10,6 @@ Artificial intelligence (AI) gig economy is coming. Many industries including Ub
 - What is R&D? Tasks to automate
 - Where does AI R&D automation lead? Recursive technology improvement
 - Where does that lead? AI services, which includes the service of developing new services
-
-Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer tasks solved using AI and machine learning. Advances in AI will enable incremental speedup and automation of human tasks.
 
 > "The AI explosion will be enabled by AI-driven AI developments. As AI technologies are being recursively improved, new AI services and new AI tasks will be solved."
 >
@@ -21,7 +19,17 @@ Unautomated AI R&D tasks are human tasks. Automated AI R&D tasks are computer ta
 
 ![ai-platform](ai-platform.jpg)
 
-At [Produvia](https://produvia.com), we are developing an **AI Platform** which aims to automate AI R&D tasks. Our vision is to create machine learning models to solve various computer science tasks and achieve full AI automation. We list a few examples of AI tasks below:
+**AI Platform** aims to automate AI R&D tasks. Our vision is to create machine learning models to solve various computer science tasks. Our mission is to achieve automation of AI technologies.
+
+> "We need to standarize AI solutions by focusing on solving AI R&D tasks while developing machine learning models that are reusable and easily accessible by all."
+>
+> -- Slava Kurilyak, Founder / CEO at Produvia
+
+**What is our approach?**
+
+We are developing service-centered or task-focused machine learning models. These models, or AI services, solve distinct tasks or functions.
+
+Examples of AI tasks include:
 
 - semantic segmentation (computer visions)
 - machine translation (natural language processing)
@@ -39,17 +47,9 @@ At [Produvia](https://produvia.com), we are developing an **AI Platform** which 
 - knowledge graphs (knowledge base)
 - adversarial attack (adversarial)
 
-> "We need to standarize AI solutions by focusing on solving AI R&D tasks while developing machine learning models that are reusable and easily accessible by all."
->
-> -- Slava Kurilyak, Founder / CEO at Produvia
-
-**What is our approach?**
-
-We are developing service-centered or task-focused machine learning models. These models, or AI services, solve distinct tasks or functions.
-
 **Proposed Folder Structure:**
 
-We propose to store machine learning models using the following folder structure:
+We store machine learning models using the following folder structure:
 
 `/tasks/area/task`
 
@@ -128,27 +128,25 @@ MLflow:
 >
 > MLflow Models: A model packaging format and tools that let you easily deploy the same model (from any ML library) to batch and real-time scoring on platforms such as Docker, Apache Spark, Azure ML and AWS SageMaker.
 
-### What is the difference between AutoML and AI Platform?
+### What is the difference between AI Platform and AutoML?
 
-AutoML aims to "make machine learning more accessible by automatically generating a data analysis pipeline that can include data pre-processing, feature selection, and feature engineering methods along with machine learning methods and parameter settings that are optimized for your data." ([AutoML.info, 2019](http://automl.info/))
+AI Platform aims to make machine learning models reusable and easily accessible by all.
 
-At Google, AutoML aims to "make AI accessible to every business". ([Google, 2019](https://cloud.google.com/blog/topics/inside-google-cloud/cloud-automl-making-ai-accessible-every-business))
+Automated machine learning (autoML) is a computer science methodology which aims to make machine learning more accessible. AutoML automatically generates data analysis pipelines, performs neural architecture search, hyperparameter optimization and automated feature engineering.
 
-At [Produvia](https://produvia.com), AI Platform aims to make machine learning models reusable and easily accessible by all.
+### What is the difference between AI tasks and human tasks?
 
-I agree with you in that requiring S3 distributed storage is not a requirement, but a recommendation. As long we keep an eye on the repository size, using `git-sizer` (https://github.com/github/git-sizer) or similar tools, we'll be in good shape.
-
-We can include a brief note on datasets, such as:
+AI tasks are computer tasks solved using AI and machine learning. Unautomated AI R&D tasks are human tasks. Advances in AI will enable incremental speedup and automation of human tasks.
 
 ## Datasets
 
 ### Uploading Your Own Dataset
 
-Do you have your own data? We recommend that you upload your own dataset onto a public bucket via [AWS S3](https://aws.amazon.com/s3) and include a `LICENSE` file which describes commercial or non-commercial rights.
+Do you have your own data? We recommend that you upload your own dataset onto a public bucket via [AWS S3](https://aws.amazon.com/s3), or [Google Drive](https://drive.google.com) and include a `LICENSE` file which describes usage rights (commercial or non-commercial).
 
 ### Finding an Existing Dataset
 
-Are you looking for a dataset? We recommend that you check out [DataSetList.com](https://www.datasetlist.com/) which includes biggest machine learning datasets for computer vision (CV), natural language processing (NLP), question answer (QA), audio, and medical industries.
+Are you looking for a dataset? We recommend that you check out [DataSetList.com](https://www.datasetlist.com/) which includes the biggest machine learning datasets for computer vision (CV), natural language processing (NLP), question answer (QA), audio, and medical industries.
 
 ## Contributing
 
@@ -173,8 +171,8 @@ When you are ready to merge your feature branch back into `master`:
 
 ### Ideas
 
-Do you have an idea on how we can improve **AI Platform**? Email us at [hello@produvia.com](mailto:hello@produvia.com)
+Do you have an idea on how we can improve **AI Platform**? Email the Produvia team at [hello@produvia.com](mailto:hello@produvia.com)
 
 ## About Produvia
 
-AI Platform was launched by the Produvia team. Since 2013, [Produvia](http://produvia.com) has partnered with companies from all industries to accelerate the adoption of AI and machine learning technologies.
+Since 2013, [Produvia](http://produvia.com) has partnered with companies from all industries to accelerate the adoption of AI and machine learning technologies.
