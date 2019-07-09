@@ -12,10 +12,16 @@ import mlflow
 
 
 class ForecastRunner(object):
-    def __init__(self, url, output_file, predicted_date):
+     def __init__(self, url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators,
+                 eval_metric):
         self.url = url
         self.output_file = output_file
         self.predicted_date = predicted_date
+        self.min_child_weight = min_child_weight
+        self.colsample_bytree = colsample_bytree
+        self.max_depth = max_depth
+        self.n_estimators = n_estimators
+        self.eval_metric = eval_metric
 
     def get_input(self):
         s = requests.get(self.url).content
@@ -92,8 +98,10 @@ class ForecastRunner(object):
     @staticmethod
     def grid_search(xtr, ytr):
         gbm = xgb.XGBRegressor()
-        reg_cv = GridSearchCV(gbm, {"colsample_bytree": [0.9], "min_child_weight": [0.8, 1.2], 'max_depth': [3, 4, 6],
-                                    'n_estimators': [500, 1000], 'eval_metric': ['rmse']}, verbose=1)
+        reg_cv = GridSearchCV(gbm,
+                              {"colsample_bytree": self.colsample_bytree, "min_child_weight": self.min_child_weight,
+                               'max_depth': self.max_depth, 'n_estimators': self.n_estimators,
+                               'eval_metric': self.eval_metric}, verbose=1)
         reg_cv.fit(xtr, ytr)
         return reg_cv
 
