@@ -76,6 +76,7 @@ else:
                         upscale_factor=upscale_factor,
                         growth_rate=64,rdb_number=5,rdb_conv_layers=5,res_blocks=16,
                         device=device,best_model_file=new_model_path)
+net.device = device    
 net = net.to(device)
 lr = net.find_lr(loaders[train_name],plot=False)
 net.fit(loaders[train_name],loaders[val_name],epochs=epochs,print_every=print_every)
