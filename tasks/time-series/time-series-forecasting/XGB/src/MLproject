@@ -3,26 +3,14 @@ conda_env: conda.yaml
 entry_points:
   main:
     parameters:
-      url: url
-      output_file: path
-      predicted_date: string
-      min_child_weight:
-        type: list
-        default: [0.8, 1.2]
-      colsample_bytree:
-        type: list
-        default: [0.9]
-      max_depth:
-        type: list
-        default: [3, 4, 6]
-      n_estimators:
-        type: list
-        default: [500, 1000]
-      eval_metric:
-        type: list
-        default: ['rmse']
+      url: {type: url, default: https://data.smartdublin.ie/dataset/10130831-d2a5-4f4f-b56b-03d8e2cc56c8/resource/6091c604-8c94-4b44-ac52-c1694e83d746/download/dccelectricitycivicsblocks34p20130221-1840.csv}
+      output_file: {type: string, default: ../output/output.csv}
+      predicted_date: {type: string, default: 2013-01-07 }
+      min_child_weight: list
+      colsample_bytree: list
+      max_depth: list
+      n_estimators: list
+      eval_metric : string
+    command: "python main.py {url} {output_file} {predicted_date} {min_child_weight} {colsample_bytree} {max_depth} {n_estimators} {eval_metric}"
 
 
-    command: python main.py --url {url} --output_file {output_file} --predicted_date {predicted_date}
-    --min_child_weight {min_child_weight} --colsample_bytree {colsample_bytree} --max_depth {max_depth}
-    --n_estimators {n_estimators} --eval_metric {eval_metric}
