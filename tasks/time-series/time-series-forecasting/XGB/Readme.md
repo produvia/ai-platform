@@ -15,8 +15,10 @@ Source : [data.gov.ie](https://data.gov.ie/dataset/energy-consumption-gas-and-el
 
 
 
-**Example run**
+**Running Example**
 
-Usage: python main.py --url {url} --output_file {output_file} --predicted_date {predicted_date}
-    --min_child_weight {min_child_weight} --colsample_bytree {colsample_bytree} --max_depth {max_depth}
-    --n_estimators {n_estimators} --eval_metric {eval_metric}
+```
+$ cd tasks/time-series/time-series-forecasting/XGB/src/
+
+$ mlflow run . -P min_child_weight=[0.8,1.2] -P colsample_bytree=[0.9] -P max_depth=[3,4] -P n_estimators=[500,1000] --no-conda
+```
