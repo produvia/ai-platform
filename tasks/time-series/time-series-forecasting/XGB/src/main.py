@@ -10,9 +10,7 @@ if __name__ == "__main__":
     colsample_bytree = eval(sys.argv[5])
     max_depth = eval(sys.argv[6])
     n_estimators = eval(sys.argv[7])
-    eval_metric = sys.argv[8]
     with mlflow.start_run():
-        model = ForecastRunner(url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth,
-                               n_estimators, eval_metric)
+        model = ForecastRunner(url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators)
         df_test = model.fit()
         model.predict(df_test)
