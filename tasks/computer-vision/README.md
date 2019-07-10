@@ -5,3 +5,4 @@
 3. Object Detection (implemented)
 4. Image Generation
 5. Denoising
+6. Super Resolution

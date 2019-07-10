@@ -1,0 +1,25 @@
+name: Super_Res
+
+conda_env: conda.yaml
+
+entry_points:
+  train:
+    parameters:
+      data_path: {type: string}
+      size: {type: int, default: 400}
+      factor: {type: int, default: 2}
+      bs: {type: int, default: 32}
+      epochs: {type: int, default: 20}
+      load: {type: bool, default: True}
+      load_path: {type: string, default: ''}
+      device: {type: string, default: 'cpu'}
+    command: "python train.py {data_path} {size} {factor} {bs} {epochs} {load} {load_path} {device}"
+
+  super_res:
+    parameters:
+      input_path: {type: string}
+      factor: {type: int, default: 2}
+      output_path: {type: string, default: 'output.png'}
+      load_path: {type: string, default: ''}
+      device: {type: string, default: 'cpu'}
+    command: "python super_res.py {input_path} {factor} {output_path} {load_path} {device}"  
