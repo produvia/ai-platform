@@ -10,7 +10,6 @@ entry_points:
       colsample_bytree: list
       max_depth: list
       n_estimators: list
-      eval_metric : string
-    command: "python main.py {url} {output_file} {predicted_date} {min_child_weight} {colsample_bytree} {max_depth} {n_estimators} {eval_metric}"
+    command: "python main.py {url} {output_file} {predicted_date} {min_child_weight} {colsample_bytree} {max_depth} {n_estimators}"
 
 
