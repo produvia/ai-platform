@@ -12,16 +12,14 @@ import mlflow.sklearn
 
 
 class ForecastRunner(object):
-     def __init__(self, url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators,
-                 eval_metric):
+     def __init__(self, url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators):
         self.url = url
         self.output_file = output_file
         self.predicted_date = predicted_date
-        self.min_child_weight = min_child_weight
-        self.colsample_bytree = colsample_bytree
-        self.max_depth = max_depth
-        self.n_estimators = n_estimators
-        self.eval_metric = eval_metric
+        self.min_child_weight = [float(i) for i in eval(min_child_weight)]
+        self.colsample_bytree = [float(i) for i in eval(colsample_bytree)]
+        self.max_depth = [int(i) for i in eval(max_depth)]
+        self.n_estimators = [int(i) for i in eval(n_estimators)]
 
     def get_input(self):
         s = requests.get(self.url).content
@@ -99,8 +97,7 @@ class ForecastRunner(object):
         gbm = xgb.XGBRegressor()
         reg_cv = GridSearchCV(gbm,
                               {"colsample_bytree": self.colsample_bytree, "min_child_weight": self.min_child_weight,
-                               'max_depth': self.max_depth, 'n_estimators': self.n_estimators,
-                               'eval_metric': self.eval_metric}, verbose=1)
+                               'max_depth': self.max_depth, 'n_estimators': self.n_estimators}, verbose=1)
         reg_cv.fit(xtr, ytr)
         return reg_cv
 
