@@ -152,27 +152,17 @@ Are you looking for a dataset? We recommend that you check out [DataSetList.com]
 
 ### Code
 
-When contributing to the codebase, please create a new feature branch:
+Do you want to contribute towards **AI Platform**?
 
-```
-$ git checkout -b feature/<YOUR_FEATURE_NAME>
-```
-
-To push your latest changes to the repo:
-
-```
-$ git push origin feature<YOUR_FEATURE_BRANCH>
-```
-
-When you are ready to merge your feature branch back into `master`:
-
-1. Ensure you have integrated [MLflow](https://github.com/mlflow/mlflow) into your codebase
-2. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
-3. Submit a pull request to the `master` branch
+1. Fork a repo ([how to guide](https://help.github.com/en/articles/fork-a-repo))
+2. Create a pull request from a fork ([how to guide](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork))
 
 ### Ideas
 
-Do you have an idea on how we can improve **AI Platform**? Email the Produvia team at [hello@produvia.com](mailto:hello@produvia.com)
+Do you have an idea, feature request, or task request for **AI Platform**?
+
+1. Create a [new issue](https://github.com/produvia/ai-platform/issues/new/choose)
+2. Email the Produvia team at [hello@produvia.com](mailto:hello@produvia.com)
 
 ## About Produvia
 
