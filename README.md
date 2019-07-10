@@ -146,7 +146,7 @@ Do you have your own data? We recommend that you upload your own dataset onto a 
 
 ### Finding an Existing Dataset
 
-Are you looking for a dataset? We recommend that you check out [DataSetList.com](https://www.datasetlist.com/) which includes the biggest machine learning datasets for computer vision (CV), natural language processing (NLP), question answer (QA), audio, and medical industries.
+Are you looking for a dataset? We recommend that you check out [DataSetList.com](https://www.datasetlist.com/) which includes the biggest machine learning datasets for computer vision (CV), natural language processing (NLP), question answer (QA), audio, and medical industries. You can also search for particular datasets using [Google Dataset Search](https://toolbox.google.com/datasetsearch).
 
 ## Contributing
 
@@ -166,8 +166,9 @@ $ git push origin feature<YOUR_FEATURE_BRANCH>
 
 When you are ready to merge your feature branch back into `master`:
 
-1. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
-2. Submit a pull request to the `master` branch
+1. Ensure you have integrated [MLflow](https://github.com/mlflow/mlflow) into your codebase
+2. Ensure you have pushed your latest changes to the origin feature/<FEATURE_BRANCH> branch
+3. Submit a pull request to the `master` branch
 
 ### Ideas
 
