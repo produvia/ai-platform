@@ -114,25 +114,25 @@ class ConstrainedLayer(nn.Module):
 class EqualizedConv2d(ConstrainedLayer):
 
     def __init__(self,
-                 nChannelsPrevious,
-                 nChannels,
-                 kernelSize,
+                 num_input_channels,
+                 num_output_channels,
+                 kernel_size,
                  padding=0,
                  bias=True,
                  **kwargs):
         r"""
         A nn.Conv2d module with specific constraints
         Args:
-            nChannelsPrevious (int): number of channels in the previous layer
-            nChannels (int): number of channels of the current layer
-            kernelSize (int): size of the convolutional kernel
+            num_input_channels (int): number of channels in the previous layer
+            num_output_channels (int): number of channels of the current layer
+            kernel_size (int): size of the convolutional kernel
             padding (int): convolution's padding
             bias (bool): with bias ?
         """
 
         ConstrainedLayer.__init__(self,
-                                  nn.Conv2d(nChannelsPrevious, nChannels,
-                                            kernelSize, padding=padding,
+                                  nn.Conv2d(num_input_channels, num_output_channels,
+                                            kernel_size, padding=padding,
                                             bias=bias),
                                   **kwargs)
 
@@ -140,28 +140,126 @@ class EqualizedConv2d(ConstrainedLayer):
 class EqualizedLinear(ConstrainedLayer):
 
     def __init__(self,
-                 nChannelsPrevious,
-                 nChannels,
+                 num_input_channels,
+                 num_output_channels,
                  bias=True,
                  **kwargs):
         r"""
         A nn.Linear module with specific constraints
         Args:
-            nChannelsPrevious (int): number of channels in the previous layer
-            nChannels (int): number of channels of the current layer
+            num_input_channels (int): number of channels in the previous layer
+            num_output_channels (int): number of channels of the current layer
             bias (bool): with bias ?
         """
 
         ConstrainedLayer.__init__(self,
-                                  nn.Linear(nChannelsPrevious, nChannels,
-                                  bias=bias), **kwargs)
+                                  nn.Linear(num_input_channels, num_output_channels,
+                                            bias=bias), **kwargs)
+
+
+class SmoothUpsample(nn.Module):
+    """
+    https://arxiv.org/pdf/1904.11486.pdf
+    # this is in the tf implementation too
+    """
+    def __init__(self,
+                 num_input_channels,
+                 num_output_channels,
+                 kernel_size,
+                 padding=0,
+                 bias=True):
+        super(SmoothUpsample, self).__init__()
+        self.weight = nn.Parameter(torch.randn(num_output_channels,
+                                               num_input_channels,
+                                               kernel_size,
+                                               kernel_size))
+
+        if bias:
+            self.bias = nn.Parameter(torch.zeros(num_output_channels))
+        self.padding = padding
+
+    def forward(self, x):
+        # change to in_channels, out_channels, kernel_size, kernel_size
+        weight = self.weight.permute([1, 0, 2, 3])
+        weight = F.pad(weight, [1, 1, 1, 1])
+        weight = (weight[:, :, 1:, 1:]
+                  + weight[:, :, :-1, 1:]
+                  + weight[:, :, 1:, :-1]
+                  + weight[:, :, :-1, :-1]
+                 ) / 4
+        x = F.conv_transpose2d(x,
+                               weight,
+                               self.bias,
+                               stride=2,
+                               padding=self.padding)
+        return x
+
+
+class EqulizedSmoothUpsample(ConstrainedLayer):
+    def __init__(self,
+                 num_input_channels,
+                 num_output_channels,
+                 kernel_size,
+                 padding=0,
+                 bias=True,
+                 **kwargs):
+        ConstrainedLayer.__init__(self, SmoothUpsample(num_input_channels,
+                                                       num_output_channels,
+                                                       kernel_size=kernel_size,
+                                                       padding=padding,
+                                                       bias=bias), **kwargs)
+
+
+class Upscale2dConv2d(nn.Module):
+
+    def __init__(self,
+                 num_input_channels,
+                 num_output_channels,
+                 kernel_size,
+                 use_wscale,
+                 fused_scale='auto',
+                 **kwargs):
+        super(Upscale2dConv2d, self).__init__()
+        # kernel_size assert (from official tf implementation):
+        # this is due to the fact that the input size is always even
+        # and use kernel_size // 2 ensures 'same' padding from tf
+        assert kernel_size >= 1 and kernel_size % 2 == 1
+        assert fused_scale in [True, False, 'auto']
+        self.fused_scale = fused_scale
+        self.upscale = Upscale2d()
+        self.conv = EqualizedConv2d(num_input_channels,
+                                    num_output_channels,
+                                    kernel_size,
+                                    padding=kernel_size // 2,
+                                    equalized=use_wscale,
+                                    )
+        self.upscale_conv = EqulizedSmoothUpsample(num_input_channels,
+                                                   num_output_channels,
+                                                   kernel_size,
+                                                   padding=(kernel_size - 1) // 2,
+                                                   equalized=use_wscale,
+                                                  )
+
+    def forward(self, x):
+        if self.fused_scale == 'auto':
+            fused_scale = min(x.size()[2:]) >= 128
+
+        if not fused_scale:
+            return self.conv(self.upscale(x))
+        else:
+            return self.upscale_conv(x)
+
 
 
 class EqualizedBiasMixin(nn.Module):
 
-    def __init__(self, num_channels, lrmul=1.):
+    def __init__(self, num_channels, equalized=True, lrmul=1.):
+        super(EqualizedBiasMixin, self).__init__()
         self.bias = nn.Parameter(torch.zeros(num_channels))
-        self.lrmul = lrmul
+        if equalized:
+            self.lrmul = lrmul
+        else:
+            self.lrmul = 1.0
 
     def forward(self, x):
         dim = x.dim()
@@ -192,7 +290,7 @@ class NoiseMixin(nn.Module):
         assert len(x.size()) == 4
         s = x.size()
         if noise is None:
-            noise = torch.randn(s[0], 1, s[2], s[3], device=x.divice, dtype=x.dtype)
+            noise = torch.randn(s[0], 1, s[2], s[3], device=x.device, dtype=x.dtype)
         x = x + self.weight.view(1, -1, 1, 1) * noise
 
         return x
@@ -209,11 +307,7 @@ class StyleMixin(nn.Module):
                  use_wscale        # use equalized learning rate?
                  ):
         super(StyleMixin, self).__init__()
-        if use_wscale:
-            self.linear = EqualizedLinear(dlatent, num_output_channels)
-        else:
-            self.linear = nn.Linear(dlatent, num_output_channels, bias=True)
-
+        self.linear = EqualizedLinear(dlatent, num_output_channels, equalized=use_wscale)
 
     def forward(self, x, w):
         # x is instance normalized
@@ -258,7 +352,7 @@ class LayerEpilogue(nn.Module):
         if use_noise:
             layers.append(('noise', NoiseMixin(num_channels)))
         # lrmul = 1.0 here?
-        layers.append(('bias', EqualizedBiasMixin(num_channels)))
+        layers.append(('bias', EqualizedBiasMixin(num_channels, use_wscale)))
         layers.append(('act', act))
 
         # to follow the tf implementation
@@ -271,7 +365,7 @@ class LayerEpilogue(nn.Module):
 
         if use_styles:
             self.style_mod = StyleMixin(dlatent_size,
-                                        num_channels,
+                                        num_channels * 2,
                                         use_wscale=use_wscale)
     def forward(self, x, dlatent):
         # dlatent is w
@@ -286,7 +380,7 @@ class EarlyBlock(nn.Module):
     The first block for 4x4 resolution
     """
     def __init__(self,
-                 nf,
+                 in_channels,
                  dlatent_size,
                  const_input_layer,
                  use_wscale,
@@ -298,11 +392,14 @@ class EarlyBlock(nn.Module):
                  ):
         super(EarlyBlock, self).__init__()
         self.const_input_layer = const_input_layer
-        self.nf = nf
+        self.in_channels = in_channels
 
         if const_input_layer:
-            self.const = nn.Parameter(torch.ones(1, nf, 4, 4))
-        self.epi1 = LayerEpilogue(nf,
+            self.const = nn.Parameter(torch.ones(1, in_channels, 4, 4))
+        else:
+            self.dense = EqualizedLinear(dlatent_size, in_channels * 16, equalized=use_wscale)
+
+        self.epi0 = LayerEpilogue(in_channels,
                                   dlatent_size,
                                   use_wscale,
                                   use_pixel_norm,
@@ -311,9 +408,14 @@ class EarlyBlock(nn.Module):
                                   use_styles,
                                   nonlinearity
                                   )
-        self.conv = EqualizedConv2d(nf, nf, 3)
+        # kernel size must be 3 or other odd numbers
+        # so that we have 'same' padding
+        self.conv = EqualizedConv2d(num_input_channels=in_channels,
+                                    num_output_channels=in_channels,
+                                    kernel_size=3,
+                                    padding=3//2)
 
-        self.epi2 = LayerEpilogue(nf,
+        self.epi1 = LayerEpilogue(in_channels,
                                   dlatent_size,
                                   use_wscale,
                                   use_pixel_norm,
@@ -328,10 +430,12 @@ class EarlyBlock(nn.Module):
         batch_size = dlatents.size(0)
         if self.const_input_layer:
             x = self.const.expand(batch_size, -1, -1, -1)
+        else:
+            x = self.dense(dlatents_0).view(batch_size, self.in_channels, 4, 4)
 
-        x = self.epi1(x, dlatents_0)
+        x = self.epi0(x, dlatents_0)
         x = self.conv(x)
-        x = self.epi2(x, dlatents_1)
+        x = self.epi0(x, dlatents_1)
         return x
 
 
@@ -351,8 +455,54 @@ class LaterBlock(nn.Module):
                  use_styles,
                  nonlinearity,
                  blur_filter,
+                 res,
                  ):
         super(LaterBlock, self).__init__()
+
+        # res = log2(H), H is 4, 8, 16, 32 ... 1024
+
+        assert isinstance(res, int) and (2 <= res <= 10)
+
+        self.res = res
+
         if blur_filter:
-            self.
-        self.epi1
+            self.blur = Blur2d(blur_filter)
+
+        # name 'conv0_up' is used in tf implementation
+        self.conv0_up = Upscale2dConv2d(num_input_channels=in_channels,
+                                        num_output_channels=out_channels,
+                                        kernel_size=3,
+                                        use_wscale=use_wscale)
+
+        self.epi0 = LayerEpilogue(out_channels,
+                                  dlatent_size,
+                                  use_wscale,
+                                  use_noise,
+                                  use_pixel_norm,
+                                  use_instance_norm,
+                                  use_styles,
+                                  nonlinearity)
+
+        # name 'conv1' is used in tf implementation
+        self.conv1 = Upscale2dConv2d(out_channels,
+                                     out_channels,
+                                     kernel_size=3,
+                                     use_wscale=use_wscale,
+                                     )
+
+        self.epi1 = LayerEpilogue(out_channels,
+                                  dlatent_size,
+                                  use_wscale,
+                                  use_noise,
+                                  use_pixel_norm,
+                                  use_instance_norm,
+                                  use_styles,
+                                  nonlinearity)
+
+    def forward(self, x, dlatent):
+        x = self.conv0_up(x)
+        x = self.epi0(x, dlatent[:, self.res * 2 - 4])
+        x = self.conv1(x)
+        x = self.epi1(x, dlatent[:, self.res * 2 - 3])
+        return x
+
