@@ -5,18 +5,18 @@ from collections import OrderedDict
 from networks.custom_layers import EqualizedLinear, EqualizedConv2d, \
     NormalizationLayer, EarlyBlock, LaterBlock
 
-class MappingNet(nn.Module):
+class MappingNet(nn.Sequential):
     """
     A mapping network f implemented using an 8-layer MLP
     """
     def __init__(self,
                  resolution=1024,
+                 num_layers=8,
                  dlatent_size=512,
                  normalize_latents=True,
                  nonlinearity='lrelu',
                  maping_lrmul=0.01): # We thus reduce the learning rate by two orders of magnitude for the mapping network
 
-        super(MappingNet, self).__init__()
         resolution_log2: int = int(np.log2(resolution))
 
         assert resolution == 2**resolution_log2 and 4 <= resolution <= 1024
@@ -26,23 +26,22 @@ class MappingNet(nn.Module):
             'lrelu': nn.LeakyReLU(negative_slope=0.2)
         }[nonlinearity]
 
-        num_layers = resolution_log2 * 2 - 2
+        self.dlatent_broadcast = resolution_log2 * 2 - 2
         layers = []
         if normalize_latents:
             layers.append(('pixel_norm', NormalizationLayer()))
         for i in range(num_layers):
-            layers.append(('fc{}'.format(i), EqualizedLinear(dlatent_size,
-                                                             dlatent_size,
-                                                             lrMul=maping_lrmul)))
-            layers.append(('fc{}_act'.format(i), act))
+            layers.append(('dense{}'.format(i), EqualizedLinear(dlatent_size,
+                                                                dlatent_size,
+                                                                use_wscale=True,
+                                                                lrmul=maping_lrmul)))
+            layers.append(('dense{}_act'.format(i), act))
 
-        self.layers = nn.Sequential(OrderedDict(layers))
-        # let's just use the tf implementation's default
-        self.dlatent_broadcast = num_layers
+        super().__init__(OrderedDict(layers))
 
     def forward(self, x):
         # N x 512
-        w = self.layers(x)
+        w = super().forward(x)
         if self.dlatent_broadcast is not None:
             # broadcast
             # tf.tile in the official tf implementation:
@@ -65,12 +64,10 @@ class SynthesisNet(nn.Module):
                  use_styles         = True,
                  const_input_layer  = True,
                  use_noise          = True,
-                 randomize_noise    = True,
                  nonlinearity       = 'lrelu',
                  use_wscale         = True,
-                 use_pixel_norm     = True,
+                 use_pixel_norm     = False,
                  use_instance_norm  = True,
-                 dtype              = torch.float32,
                  blur_filter        = [1, 2, 1]            # low-pass filer to apply when resampling activations. None = no filtering
                  ):
         super(SynthesisNet, self).__init__()
@@ -97,9 +94,10 @@ class SynthesisNet(nn.Module):
         # 2....10 (inclusive) for 1024 resolution
         for res in range(2, resolution_log2 + 1):
             channels = nf(res - 1)
+            block_name = '{s}x{s}'.format(s=2**res)
             if res == 2:
                 # early block
-                block = EarlyBlock(channels,
+                block = (block_name, EarlyBlock(channels,
                                    dlatent_size,
                                    const_input_layer,
                                    use_wscale,
@@ -107,9 +105,9 @@ class SynthesisNet(nn.Module):
                                    use_pixel_norm,
                                    use_instance_norm,
                                    use_styles,
-                                   nonlinearity)
+                                   nonlinearity))
             else:
-                block = LaterBlock(last_channels,
+                block = (block_name, LaterBlock(last_channels,
                                    out_channels=channels,
                                    dlatent_size=dlatent_size,
                                    use_wscale=use_wscale,
@@ -120,20 +118,23 @@ class SynthesisNet(nn.Module):
                                    nonlinearity=nonlinearity,
                                    blur_filter=blur_filter,
                                    res=res,
-                                  )
+                                  ))
 
             blocks.append(block)
             last_channels = channels
 
-        self.torgb = EqualizedConv2d(channels, num_channels, 1, equalized=use_wscale)
-        self.blocks = nn.ModuleList(blocks)
+        # the last one has bias
+        self.torgb = EqualizedConv2d(channels, num_channels, 1, use_wscale=use_wscale)
+
+        #self.torgb = Upscale2dConv2d2(channels, num_channels, 1, gain=1, use_wscale=use_wscale, bias=True)
+        self.blocks = nn.ModuleDict(OrderedDict(blocks))
 
     def forward(self, dlatents):
-        for i, b in enumerate(self.blocks):
+        for i, b in enumerate(self.blocks.values()):
             if i == 0:
-                x = b(dlatents)
+                x = b(dlatents[:, 2*i:2*i+2])
             else:
-                x = b(x, dlatents)
+                x = b(x, dlatents[:, 2*i:2*i+2])
 
         rgb = self.torgb(x)
 
