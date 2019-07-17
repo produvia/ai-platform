@@ -83,15 +83,6 @@ For more information, check out documentation for the different services:
 
 - [/tasks](https://github.com/produvia/ai-platform/tree/master/tasks) - for compilation of AI tasks
 
-## Project Dependencies
-
-![ai-platform-mlflow](ai-platform-mlflow.jpg)
-
-- We use [MLflow](https://github.com/mlflow/mlflow) for model tracking and model deployment. MLflow is an open source platform for machine learning lifecycle. Familiarize yourself with MLflow by going through the following resources:
-	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
-	2. Watch [MLflow intro video on YouTube](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
-	3. Watch [MLflow videos on YouTube](https://www.youtube.com/playlist?list=PLTPXxbhUt-YVstcW1-OrYoRiAipXRManO)
-
 ## Supported Programming Languages
 
 AI Platform supports various programming languages:
@@ -154,8 +145,10 @@ Are you looking for a dataset? We recommend that you check out [DataSetList.com]
 
 Do you want to contribute towards **AI Platform**?
 
-1. Fork a repo ([how to guide](https://help.github.com/en/articles/fork-a-repo))
-2. Create a pull request from a fork ([how to guide](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork))
+1. Fork this repo ([how to guide](https://help.github.com/en/articles/fork-a-repo)).
+2. Develop a new machine learning model or improve an existing one. Review existing [tasks](https://github.com/produvia/ai-platform/tree/master/tasks) and outstanding [issues](https://github.com/produvia/ai-platform/issues) and [pull requests](https://github.com/produvia/ai-platform/pulls).
+3. Integrate [MLflow](https://github.com/mlflow/mlflow) into your code.
+4. Create a pull request from your fork ([how to guide](https://help.github.com/en/articles/creating-a-pull-request-from-a-fork)).
 
 ### Ideas
 
@@ -163,6 +156,15 @@ Do you have an idea, feature request, or task request for **AI Platform**?
 
 1. Create a [new issue](https://github.com/produvia/ai-platform/issues/new/choose)
 2. Email the Produvia team at [hello@produvia.com](mailto:hello@produvia.com)
+
+## Project Dependencies
+
+![ai-platform-mlflow](ai-platform-mlflow.jpg)
+
+- At **AI Platform**, we use [MLflow](https://github.com/mlflow/mlflow) for model tracking and model deployment. MLflow is an open source platform for machine learning lifecycle. Familiarize yourself with MLflow by going through the following resources:
+	1. Review [MLflow examples](https://github.com/mlflow/mlflow/tree/master/examples) hosted on Github.
+	2. Watch [MLflow intro video on YouTube](https://www.youtube.com/watch?v=QJW_kkRWAUs) by Matei Zaharia, Co-founder and Chief Technologist at Databricks.
+	3. Watch [MLflow videos on YouTube](https://www.youtube.com/playlist?list=PLTPXxbhUt-YVstcW1-OrYoRiAipXRManO)
 
 ## About Produvia
 
