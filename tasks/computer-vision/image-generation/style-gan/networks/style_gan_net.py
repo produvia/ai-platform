@@ -3,7 +3,9 @@ import torch
 import torch.nn as nn
 from collections import OrderedDict
 from networks.custom_layers import EqualizedLinear, EqualizedConv2d, \
-    NormalizationLayer, EarlyBlock, LaterBlock
+    NormalizationLayer
+from networks.building_blocks import EarlySynthesisBlock, LaterSynthesisBlock, \
+    EarlyDiscriminatorBlock, LaterDiscriminatorBlock
 
 class MappingNet(nn.Sequential):
     """
@@ -97,28 +99,28 @@ class SynthesisNet(nn.Module):
             block_name = '{s}x{s}'.format(s=2**res)
             if res == 2:
                 # early block
-                block = (block_name, EarlyBlock(channels,
-                                   dlatent_size,
-                                   const_input_layer,
-                                   use_wscale,
-                                   use_noise,
-                                   use_pixel_norm,
-                                   use_instance_norm,
-                                   use_styles,
-                                   nonlinearity))
+                block = (block_name, EarlySynthesisBlock(channels,
+                                                         dlatent_size,
+                                                         const_input_layer,
+                                                         use_wscale,
+                                                         use_noise,
+                                                         use_pixel_norm,
+                                                         use_instance_norm,
+                                                         use_styles,
+                                                         nonlinearity))
             else:
-                block = (block_name, LaterBlock(last_channels,
-                                   out_channels=channels,
-                                   dlatent_size=dlatent_size,
-                                   use_wscale=use_wscale,
-                                   use_noise=use_noise,
-                                   use_pixel_norm=use_pixel_norm,
-                                   use_instance_norm=use_instance_norm,
-                                   use_styles=use_styles,
-                                   nonlinearity=nonlinearity,
-                                   blur_filter=blur_filter,
-                                   res=res,
-                                  ))
+                block = (block_name, LaterSynthesisBlock(last_channels,
+                                                         out_channels=channels,
+                                                         dlatent_size=dlatent_size,
+                                                         use_wscale=use_wscale,
+                                                         use_noise=use_noise,
+                                                         use_pixel_norm=use_pixel_norm,
+                                                         use_instance_norm=use_instance_norm,
+                                                         use_styles=use_styles,
+                                                         nonlinearity=nonlinearity,
+                                                         blur_filter=blur_filter,
+                                                         res=res,
+                                                         ))
 
             blocks.append(block)
             last_channels = channels
@@ -132,12 +134,56 @@ class SynthesisNet(nn.Module):
     def forward(self, dlatents):
         for i, b in enumerate(self.blocks.values()):
             if i == 0:
-                x = b(dlatents[:, 2*i:2*i+2])
+                x = b(dlatents)
             else:
-                x = b(x, dlatents[:, 2*i:2*i+2])
+                x = b(x, dlatents)
 
         rgb = self.torgb(x)
 
         return rgb
 
 
+class BasicDiscriminator(nn.Sequential):
+
+    def __init__(self,
+                 images_in,
+                 labels_in,
+                 num_channels       = 3,
+                 resolution         = 1024,
+                 fmap_base          = 8192,
+                 fmap_decay         = 1.0,
+                 fmap_max           = 512,
+                 nonlinearity       = 'lrelu',
+                 mbstd_group_size   = 4,
+                 mbstd_num_features = 1,
+                 use_wscale         = True,
+                 fused_scale        = 'auto',
+                 blur_filter        =  [1, 2, 1],
+                 ):
+        resolution_log2: int = int(np.log2(resolution))
+
+        assert resolution == 2**resolution_log2 and 4 <= resolution <= 1024
+
+        def nf(stage): return min(int(fmap_base / (2.0 ** (stage * fmap_decay))), fmap_max)
+
+        act = {
+            'relu': torch.relu,
+            'lrelu': nn.LeakyReLU(negative_slope=0.2)
+        }[nonlinearity]
+        # this is fixed. We need to grow it...
+        layers = []
+        layers.append(('fromrgb', EqualizedConv2d(num_channels, nf(resolution_log2-1), 1, use_wscale=use_wscale)))
+        layers.append(('act', act))
+        for res in range(resolution_log2, 2, -1):
+            layers.append(('{s}x{s}'.format(s=2**res), EarlyDiscriminatorBlock(in_channels=nf(res-1),
+                                                                               out_channels=nf(res-2),
+                                                                               use_wscale=use_wscale,
+                                                                               nonlinearity=nonlinearity)))
+        layers.append(('4x4', LaterDiscriminatorBlock(in_channels=nf(2),
+                                                      out_channels=1,
+                                                      mbstd_group_size=mbstd_group_size,
+                                                      mbstd_num_features=mbstd_num_features,
+                                                      res=2
+                                                      )))
+
+        super().__init__(OrderedDict(layers))
