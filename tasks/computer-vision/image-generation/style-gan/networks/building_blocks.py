@@ -208,7 +208,14 @@ class LaterSynthesisBlock(nn.Module):
 
 
 class EarlyDiscriminatorBlock(nn.Sequential):
-    def __init__(self, in_channels, out_channels, use_wscale, nonlinearity):
+    def __init__(self,
+                 res,
+                 in_channels,
+                 out_channels,
+                 use_wscale,
+                 blur_filter,
+                 fused_scale,
+                 nonlinearity):
         act = {
             'relu': torch.relu,
             'lrelu': nn.LeakyReLU(negative_slope=0.2)
@@ -224,15 +231,17 @@ class EarlyDiscriminatorBlock(nn.Sequential):
         # note that we don't have layer epilogue in discriminator, so we need to add activation layer mannually
         layers.append(('act0', act))
 
-        layers.append(('blur', Blur2d()))
+        layers.append(('blur', Blur2d(blur_filter)))
 
-        layers.append(('conv1_down', Downscale2dConv2d(in_channels=in_channels,
+        layers.append(('conv1_down', Downscale2dConv2d(res=res,
+                                                       in_channels=in_channels,
                                                        out_channels=out_channels,
                                                        kernel_size=3,
+                                                       fused_scale=fused_scale,
                                                        use_wscale=use_wscale)))
         layers.append(('act1', act))
 
-        super().__init___(OrderedDict(layers))
+        super().__init__(OrderedDict(layers))
 
 
 class LaterDiscriminatorBlock(nn.Sequential):
@@ -261,12 +270,12 @@ class LaterDiscriminatorBlock(nn.Sequential):
                                                use_wscale=use_wscale)))
         layers.append(('act0', act))
         layers.append(('flatten', Flatten()))
-        layers.append(('dense0'), EqualizedLinear(in_channels=in_channels * (resolution**2),
+        layers.append(('dense0', EqualizedLinear(in_channels=in_channels * (resolution**2),
                                                   out_channels=in_channels,
-                                                  use_wscale=use_wscale))
+                                                  use_wscale=use_wscale)))
         layers.append(('act1', act))
         # no activation for the last fc
         layers.append(('dense1', EqualizedLinear(in_channels=in_channels,
                                                  out_channels=out_channels)))
 
-        super().__init___(OrderedDict(layers))
+        super().__init__(OrderedDict(layers))

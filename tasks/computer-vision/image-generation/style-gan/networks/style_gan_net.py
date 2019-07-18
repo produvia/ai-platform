@@ -12,12 +12,13 @@ class MappingNet(nn.Sequential):
     A mapping network f implemented using an 8-layer MLP
     """
     def __init__(self,
-                 resolution=1024,
-                 num_layers=8,
-                 dlatent_size=512,
-                 normalize_latents=True,
-                 nonlinearity='lrelu',
-                 maping_lrmul=0.01): # We thus reduce the learning rate by two orders of magnitude for the mapping network
+                 resolution            = 1024,
+                 num_layers            = 8,
+                 dlatent_size          = 512,
+                 normalize_latents     = True,
+                 nonlinearity          = 'lrelu',
+                 maping_lrmul          = 0.01,      # We thus reduce the learning rate by two orders of magnitude for the mapping network
+                 **kwargs):                         # other parameters are ignored
 
         resolution_log2: int = int(np.log2(resolution))
 
@@ -70,7 +71,8 @@ class SynthesisNet(nn.Module):
                  use_wscale         = True,
                  use_pixel_norm     = False,
                  use_instance_norm  = True,
-                 blur_filter        = [1, 2, 1]            # low-pass filer to apply when resampling activations. None = no filtering
+                 blur_filter        = [1, 2, 1],            # low-pass filer to apply when resampling activations. None = no filtering
+                 **kwargs                                   # other parameters are ignored
                  ):
         super(SynthesisNet, self).__init__()
 
@@ -92,11 +94,13 @@ class SynthesisNet(nn.Module):
         num_styles = num_layers if use_styles else 1
 
         blocks = []
+        torgbs = []
 
         # 2....10 (inclusive) for 1024 resolution
         for res in range(2, resolution_log2 + 1):
             channels = nf(res - 1)
             block_name = '{s}x{s}'.format(s=2**res)
+            torgb_name = 'torgb_lod{}'.format(resolution_log2 - res)
             if res == 2:
                 # early block
                 block = (block_name, EarlySynthesisBlock(channels,
@@ -122,16 +126,21 @@ class SynthesisNet(nn.Module):
                                                          res=res,
                                                          ))
 
+            # torgb block
+            torgb = (torgb_name, EqualizedConv2d(channels, num_channels, 1, use_wscale=use_wscale))
+
             blocks.append(block)
+            torgbs.append(torgb)
             last_channels = channels
 
         # the last one has bias
-        self.torgb = EqualizedConv2d(channels, num_channels, 1, use_wscale=use_wscale)
+        self.torgbs = nn.ModuleDict(OrderedDict(torgbs))
 
         #self.torgb = Upscale2dConv2d2(channels, num_channels, 1, gain=1, use_wscale=use_wscale, bias=True)
         self.blocks = nn.ModuleDict(OrderedDict(blocks))
 
-    def forward(self, dlatents):
+
+    def forward(self, dlatents, step=0):
         for i, b in enumerate(self.blocks.values()):
             if i == 0:
                 x = b(dlatents)
@@ -143,11 +152,18 @@ class SynthesisNet(nn.Module):
         return rgb
 
 
+# a convenient wrapping class
+class Generator(nn.Sequential):
+    def __init__(self, **kwargs):
+        super().__init__(OrderedDict([
+            ('g_mapping', MappingNet(**kwargs)),
+            ('g_synthesis', SynthesisNet(**kwargs))
+        ]))
+
+
 class BasicDiscriminator(nn.Sequential):
 
     def __init__(self,
-                 images_in,
-                 labels_in,
                  num_channels       = 3,
                  resolution         = 1024,
                  fmap_base          = 8192,
@@ -175,14 +191,19 @@ class BasicDiscriminator(nn.Sequential):
         layers.append(('fromrgb', EqualizedConv2d(num_channels, nf(resolution_log2-1), 1, use_wscale=use_wscale)))
         layers.append(('act', act))
         for res in range(resolution_log2, 2, -1):
-            layers.append(('{s}x{s}'.format(s=2**res), EarlyDiscriminatorBlock(in_channels=nf(res-1),
+            layers.append(('{s}x{s}'.format(s=2**res), EarlyDiscriminatorBlock(res=res,
+                                                                               in_channels=nf(res-1),
                                                                                out_channels=nf(res-2),
                                                                                use_wscale=use_wscale,
+                                                                               blur_filter=blur_filter,
+                                                                               fused_scale=fused_scale,
                                                                                nonlinearity=nonlinearity)))
         layers.append(('4x4', LaterDiscriminatorBlock(in_channels=nf(2),
                                                       out_channels=1,
                                                       mbstd_group_size=mbstd_group_size,
                                                       mbstd_num_features=mbstd_num_features,
+                                                      use_wscale=use_wscale,
+                                                      nonlinearity=nonlinearity,
                                                       res=2
                                                       )))
 

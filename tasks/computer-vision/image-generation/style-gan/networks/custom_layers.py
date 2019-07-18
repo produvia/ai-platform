@@ -87,7 +87,7 @@ class Blur2d(nn.Module):
         )
         return x
 
-class MiniBatchStdDev(nn.module):
+class MiniBatchStdDev(nn.Module):
     r"""
     Add a minibatch standard deviation channel to the current layer.
     In other words:
@@ -211,7 +211,7 @@ class EqualizedConv2d(ConstrainedLayer):
         """
 
         # always set bias to False
-        # and apply bias manually
+        # and apply bias manually in constrained layer
         ConstrainedLayer.__init__(self,
                                   nn.Conv2d(in_channels, out_channels,
                                             kernel_size, padding=padding,
@@ -380,7 +380,7 @@ class Downscale2dConv2d(nn.Module):
                  out_channels,
                  kernel_size,
                  use_wscale,
-                 fused_scale='auto',
+                 fused_scale,
                  **kwargs):
         super(Downscale2dConv2d, self).__init__()
         # kernel_size assert (from official tf implementation):
