@@ -1,0 +1,16 @@
+name: segmentation
+channels:
+  - rdkit
+  - defaults
+dependencies:
+  - python==3.6
+  - numpy
+  - pandas
+  - glob
+  - tensorflow-mkl
+  - matplotlib
+  - opencv-python
+  - scikit-learn
+  - keras
+  - pip:
+    - mlflow>=1.0

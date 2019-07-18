@@ -1,0 +1,15 @@
+name: lungsegmentation
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      image_path: {type: string, default: "../finding-lungs-in-ct-data/2d_images/"}
+      annotation_path: {type: string, default: "../finding-lungs-in-ct-data/2d_masks/"}
+      weights_path: {type: string, default: "../weights/"}
+      log_dir: {type: string, default: "../logs/"}
+      initial_lr: {type: float, default: 1e-3}
+      batch_size: {type: int, default: 8}
+      seed: {type: int, default: 3}
+    command: "python lungs_incp_unet_snapshot_MLflow.py"
