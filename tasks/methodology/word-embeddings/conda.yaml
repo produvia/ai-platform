@@ -1,0 +1,10 @@
+name: word_embedding
+channels:
+  - defaults
+dependencies:
+  - python=3.7
+  - pandas=0.24.2
+  - numpy=1.16.4
+  - pip:
+    - mlflow>=1.0
+    - gensim==3.8.0

@@ -1,0 +1,12 @@
+name: word_embedding
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      word1: string
+      word2: string
+      topn: {type: integer, default: 10}
+
+    command: "python word_embeddings.py {word1} {word2} {topn}"
