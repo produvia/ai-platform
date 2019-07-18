@@ -1,5 +1,8 @@
 import os.path
 import requests
+""" Reused from the image_detection module
+"""
+
 
 def download_file(filename, url):
 	"""

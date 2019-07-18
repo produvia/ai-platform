@@ -1,13 +1,18 @@
 # Load yolov3 model and perform object detection
 # Credit Jason Brownlee, https://machinelearningmastery.com/how-to-perform-object-detection-with-yolov3-in-keras/
 
-import requests
+"""" Post processing for images, Only a few changes to the existing post processing for object detection from the ai-platform. This implementation
+can be applied to any dataset such as coco, voc, openimages from which labels are read from the dataset file unlike the static labels for coco. 
+"""
+
 import os.path
-import sys
+#import sys
+#sys.path.append(r"C:\Users\LEGION\tf1")
 import warnings
 # from download_file import download_if_not_exists
 import mlflow
 import mlflow.keras
+import cv2
 import numpy as np
 from numpy import expand_dims
 from keras.models import load_model
@@ -15,6 +20,7 @@ from keras.preprocessing.image import load_img
 from keras.preprocessing.image import img_to_array
 from matplotlib import pyplot
 from matplotlib.patches import Rectangle
+from yolov3_weights_to_keras import dataset_process
 
 
 class BoundBox:
@@ -47,7 +53,7 @@ def decode_netout(netout, anchors, obj_thresh, net_h, net_w):
 	grid_h, grid_w = netout.shape[:2]
 	nb_box = 3
 	netout = netout.reshape((grid_h, grid_w, nb_box, -1))
-	nb_class = netout.shape[-1] - 5
+	#nb_class = netout.shape[-1] - 5
 	boxes = []
 	netout[..., :2]  = _sigmoid(netout[..., :2])
 	netout[..., 4:]  = _sigmoid(netout[..., 4:])
@@ -153,7 +159,7 @@ def get_boxes(boxes, labels, thresh):
 	return v_boxes, v_labels, v_scores
 
 # draw all results
-def draw_boxes(filename, v_boxes, v_labels, v_scores):
+def draw_boxes(filename, v_boxes, v_labels, v_scores, output_photo_name):
 	# load the image
 	data = pyplot.imread(filename)
 	# plot the image
@@ -177,69 +183,71 @@ def draw_boxes(filename, v_boxes, v_labels, v_scores):
 	# show the plot
 	#pyplot.show()	
 	pyplot.savefig(output_photo_name)
+    
+def cvDrawBoxes(img, v_boxes, v_labels, v_scores):
+    for i in range(len(v_boxes)):
+        box = v_boxes[i]
+        y1, x1, y2, x2 = box.ymin, box.xmin, box.ymax, box.xmax
+        pt1, pt2 = (x1, y1), (x2,y2)
+        cv2.rectangle(img, pt1, pt2, (0, 255, 0), 1)
+        cv2.putText(img,
+                    v_labels[i] +
+                    " [" + str(round(v_scores[i], 2)) + "]",
+                    (pt1[0], pt1[1] - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                    [0, 255, 0], 2)
+    return img
+        
 
 
+def process_image(keras_model_path, size,dataset = "coco", photo_name = "data/horses.jpg"):
+    dataset = "data/{}.data".format(dataset)
+    if not os.path.exists("outputs"): os.mkdir("outputs")
+    
+    warnings.filterwarnings("ignore")
+    np.random.seed(40)
+    model = load_model(keras_model_path)
+    # define the expected input shape for the model
+    input_w, input_h = size, size
+    output_photo_name = 'outputs/objects_' + os.path.basename(photo_name)
+    # load and prepare image
+    image, image_w, image_h = load_image_pixels(photo_name, (input_w, input_h))
+    # make prediction
+    yhat = model.predict(image)
+    # summarize the shape of the list of arrays
+    print("Bounding box coordinates")
+    print([a.shape for a in yhat])
+    # define the anchors
+    anchors = [[116,90, 156,198, 373,326], [30,61, 62,45, 59,119], [10,13, 16,30, 33,23]]
+    # define the probability threshold for detected objects
+    class_threshold = 0.5
+    boxes = list()
+    for i in range(len(yhat)):
+        # decode the output of the network
+        boxes += decode_netout(yhat[i][0], anchors[i], class_threshold, input_h, input_w)
+    # correct the sizes of the bounding boxes for the shape of the image
+    correct_yolo_boxes(boxes, image_h, image_w, input_h, input_w)
+    # suppress non-maximal boxes
+    do_nms(boxes, 0.4)
+    # define the labels
+    _,labels = dataset_process(dataset) 
+    with mlflow.start_run(nested = True):
+        mlflow.log_param("keras_model_path", keras_model_path)
+        mlflow.log_param("photo_name", photo_name)
+    
+        # get the details of the detected objects
+        v_boxes, v_labels, v_scores = get_boxes(boxes, labels, class_threshold)
+        # summarize what we found
+        for i in range(len(v_boxes)):
+            print(v_labels[i], v_scores[i])
+            mlflow.set_tag(str(i) + '_' + v_labels[i], v_scores[i])
+        # draw what we found
+        draw_boxes(photo_name, v_boxes, v_labels, v_scores, output_photo_name)
+        print("Image created after object detection task and saved as:", output_photo_name)
+    
+        mlflow.log_artifact(output_photo_name, "output_photo_name")
 
 
 
 if __name__ == "__main__":
-	warnings.filterwarnings("ignore")
-	np.random.seed(40)
-
-	# download yolo3 weights
-	# download_if_not_exists('model.h5','https://yolov3keras.s3.amazonaws.com/model.h5')
-	keras_model_path = sys.argv[1] if len(sys.argv) > 1 else 'model.h5'
-	# load yolov3 model
-	model = load_model(keras_model_path)
-	# define the expected input shape for the model
-	input_w, input_h = 416, 416
-	# define our new photo
-	#photo_name = 'zebra.jpg'
-	photo_name = sys.argv[2] if len(sys.argv) > 2 else 'zebra.jpg'
-	output_photo_name = 'objects_' + os.path.basename(photo_name)
-	# load and prepare image
-	image, image_w, image_h = load_image_pixels(photo_name, (input_w, input_h))
-	# make prediction
-	yhat = model.predict(image)
-	# summarize the shape of the list of arrays
-	print("Bounding box coordinates")
-	print([a.shape for a in yhat])
-	# define the anchors
-	anchors = [[116,90, 156,198, 373,326], [30,61, 62,45, 59,119], [10,13, 16,30, 33,23]]
-	# define the probability threshold for detected objects
-	class_threshold = 0.6
-	boxes = list()
-	for i in range(len(yhat)):
-		# decode the output of the network
-		boxes += decode_netout(yhat[i][0], anchors[i], class_threshold, input_h, input_w)
-	# correct the sizes of the bounding boxes for the shape of the image
-	correct_yolo_boxes(boxes, image_h, image_w, input_h, input_w)
-	# suppress non-maximal boxes
-	do_nms(boxes, 0.5)
-	# define the labels
-	labels = ["person", "bicycle", "car", "motorbike", "aeroplane", "bus", "train", "truck",
-		"boat", "traffic light", "fire hydrant", "stop sign", "parking meter", "bench",
-		"bird", "cat", "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe",
-		"backpack", "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard",
-		"sports ball", "kite", "baseball bat", "baseball glove", "skateboard", "surfboard",
-		"tennis racket", "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana",
-		"apple", "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
-		"chair", "sofa", "pottedplant", "bed", "diningtable", "toilet", "tvmonitor", "laptop", "mouse",
-		"remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink", "refrigerator",
-		"book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush"]
-
-	with mlflow.start_run():
-		mlflow.log_param("keras_model_path", keras_model_path)
-		mlflow.log_param("photo_name", photo_name)
-
-		# get the details of the detected objects
-		v_boxes, v_labels, v_scores = get_boxes(boxes, labels, class_threshold)
-		# summarize what we found
-		for i in range(len(v_boxes)):
-			print(v_labels[i], v_scores[i])
-			mlflow.set_tag(str(i) + '_' + v_labels[i], v_scores[i])
-		# draw what we found
-		draw_boxes(photo_name, v_boxes, v_labels, v_scores)
-		print("Image created after object detection task and saved as:", output_photo_name)
-				
-		mlflow.log_artifact(output_photo_name, "output_photo_name")
+    process_image('models/yolov3-spp.h5', 608, "coco")
+    

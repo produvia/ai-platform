@@ -1,12 +1,12 @@
 """
 Download and create a YOLOv3 Keras model and save it to file and 
-load yolov3 model and perform object detection
+load yolov3 model and perform object detection.
+
+Edited from the ai-platform object detection. Allows for image, video and passing of parameters from the main to subsequent entry points
 """
 
-# import click
+import sys
 import os
-
-
 import mlflow
 from mlflow.utils import mlflow_tags
 from mlflow.entities import RunStatus
@@ -53,9 +53,6 @@ def _already_ran(entry_point_name, parameters, git_commit, experiment_id=None):
     return None
 
 
-# TODO(aaron): This is not great because it doesn't account for:
-# - changes in code
-# - changes in dependant steps
 def _get_or_run(entrypoint, parameters, git_commit, use_cache=True):
     existing_run = _already_ran(entrypoint, parameters, git_commit)
     if use_cache and existing_run:
@@ -64,21 +61,29 @@ def _get_or_run(entrypoint, parameters, git_commit, use_cache=True):
         return existing_run
     print("Launching new run for entrypoint=%s and parameters=%s" %
           (entrypoint, parameters))
-    submitted_run = mlflow.run(".", entrypoint, parameters=parameters)
+    submitted_run = mlflow.run(".", entrypoint, parameters=parameters, use_conda=False)
     return mlflow.tracking.MlflowClient().get_run(submitted_run.run_id)
 
 
-def workflow():
+def workflow(**parameters): 
+    #Arguments to the workflow allow parameters to be passed from the main to other entry points
     # Note: The entrypoint names are defined in MLproject. The artifact directories
     # are documented by each step's .py file.
     with mlflow.start_run() as active_run:
         # os.environ['SPARK_CONF_DIR'] = os.path.abspath('.')
         git_commit = active_run.data.tags.get(mlflow_tags.MLFLOW_GIT_COMMIT)
-        yolo3_weights_to_keras_run = _get_or_run(
-            "yolo3_weights_to_keras", {}, git_commit)
+        _get_or_run("yolov3_weights_to_keras", parameters, git_commit)
         _get_or_run(
-            "train", {}, git_commit)
+            "detector", parameters , git_commit)
 
 
 if __name__ == '__main__':
-    workflow()
+    
+    if not os.path.exists("models"): os.mkdir("models")
+    if not os.path.exists("outputs"): os.mkdir("outputs")
+    if sys.argv[4] =="None":
+        appendfunc = lambda spp, dataset: "-spp" if spp and dataset =="coco" else "" if dataset == "coco" else "-{}".format(dataset)
+        sys.argv[4] = 'models/yolov3{}.h5'.format(appendfunc(int(sys.argv[3]), sys.argv[2]))
+        print("model path set to {}".format(sys.argv[4]))
+    workflow(darknet_model_path = sys.argv[1], dataset = sys.argv[2], SPP = sys.argv[3], keras_model_path = sys.argv[4], mode = sys.argv[5],\
+             size = sys.argv[6], file_name = sys.argv[7], darknet_url = sys.argv[8])
