@@ -39,30 +39,31 @@ For viewing Tensorboard ui open a cmd prompt and run:
 
 `tensorboard --logdir="PATH\TO\LOGS"`
 
-For passing parameters to the programs run cmd :
+For passing parameters to the programs run cmd:
+
 `mlflow run seg_mlflow --no-conda -P PARAM_NAME_1=PARAM_VALUE_1 -P PARAM_NAME_2=PARAM_VALUE_2`
 
 Here are the available parameters:
 
-Options:
-  --image_path TEXT       Path to images folder
-  --annotation_path TEXT  Path to annotations folder
-  --weights_path TEXT     Path to base model weights file
-  --log_dir TEXT          Path to store log files
-  --initial_lr FLOAT      Initial learning rate
-  --batch_size INTEGER    Batch size for training
-  --seed INTEGER          numpy random seed
+    --image_path TEXT       Path to images folder
+    --annotation_path TEXT  Path to annotations folder
+    --weights_path TEXT     Path to base model weights file
+    --log_dir TEXT          Path to store log files
+    --initial_lr FLOAT      Initial learning rate
+    --batch_size INTEGER    Batch size for training
+    --seed INTEGER          numpy random seed
 
 ## Folder Structure
 
-semantic-segmentation     
-                     finding-lungs-in-ct-data
-                                             finding-lungs-in-ct-data
-                                                                     2d_images
-                                                                     2d_masks
-                     seg_mlflow
-                     weights
-                     logs
+    semantic-segmentation
+                         finding-lungs-in-ct-data 
+                                                 finding-lungs-in-ct-data
+                                                                         2d_images
+                                                                         2d_masks
+                         seg_mlflow
+                         weights
+                         logs
+                     
 ## Model Architecture
 
 Here an autoencoder model with the [U-Net](https://arxiv.org/abs/1505.04597) architecture is used. [Inception](https://arxiv.org/abs/1512.00567) blocks are used to extract the features and learning rate is consine annealed for more efficient training. MLflow is used for logging parameters, metrics and models. 
