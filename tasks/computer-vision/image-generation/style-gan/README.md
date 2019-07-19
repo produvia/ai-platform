@@ -20,6 +20,7 @@ Download the [celeba](https://drive.google.com/drive/folders/0B7EVK8r0v71pTUZsaX
 Run the command:
 ```bash
 mlflow -e generate . -P dataset=cats
+```
 The default random seed is 77. To generate different images with different image grid (note that the number of images you can generate is limited by your GPU).
 ```bash
 mlflow -e generate -P datasets=cats -P random_seed=777 -P nrow=2 -P ncol=5
@@ -41,6 +42,6 @@ Due to the time limitation, I didn't implement the following:
 3. Add tensorboard support
 4. Add moving average of generator's weight
 
-**All of the above are not essential to get visually good results, but are implemented in the official tensorflow implemenation.**
+**All of the above are not vital to get visually good results, but are implemented in the official tensorflow implemenation.**
 
 Multi-GPU support is added but not experimented due to hardware limitation.
