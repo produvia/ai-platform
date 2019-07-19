@@ -1,11 +1,10 @@
 channels:
   - defaults
-  - conda-forge
 dependencies:
   - python==3.7.3
   - scikit-learn==0.20.3
   - matplotlib==3.0.3
   - pip
   - pip:
-    - mlflow
+    - mlflow==1.0
     - xgboost==0.90

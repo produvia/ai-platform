@@ -5,11 +5,11 @@ entry_points:
     parameters:
       url: {type: url, default: https://data.smartdublin.ie/dataset/10130831-d2a5-4f4f-b56b-03d8e2cc56c8/resource/6091c604-8c94-4b44-ac52-c1694e83d746/download/dccelectricitycivicsblocks34p20130221-1840.csv}
       output_file: {type: string, default: ../output/output.csv}
-      predicted_date: {type: string, default: 2013-01-07 }
-      min_child_weight: list
-      colsample_bytree: list
-      max_depth: list
-      n_estimators: list
+      predicted_date: {type: string, default: 2013-01-07}
+      min_child_weight: {type: string, default: "[0.8,1.2]"}
+      colsample_bytree: {type: string, default: "[0.9]"}
+      max_depth: {type: string, default: "[3,4]"}
+      n_estimators: {type: string, default: "[500,1000]"}
     command: "python main.py {url} {output_file} {predicted_date} {min_child_weight} {colsample_bytree} {max_depth} {n_estimators}"
 
 

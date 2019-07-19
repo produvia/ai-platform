@@ -12,7 +12,7 @@ import mlflow.sklearn
 
 
 class ForecastRunner(object):
-     def __init__(self, url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators):
+    def __init__(self, url, output_file, predicted_date, min_child_weight, colsample_bytree, max_depth, n_estimators):
         self.url = url
         self.output_file = output_file
         self.predicted_date = predicted_date
@@ -35,7 +35,7 @@ class ForecastRunner(object):
         df_test = test.reset_index()[['Date']]
         prediction = df_test.join(preds)
         prediction.to_csv(self.output_file)
-        
+
     @staticmethod
     def evaluation_metrics(y_true, y_pred):
         mape = np.mean(np.abs((np.array(y_true) - np.array(y_pred)) / np.array(y_true))) * 100
@@ -49,7 +49,7 @@ class ForecastRunner(object):
         """
         Median Absolute Deviation (MAD) based outlier detection
         Removes outliers and if selected fills with polynomial  interpolation
-        fill: Boolean 
+        fill: Boolean
         """
         median = np.median(data.values, axis=0)
         diff = np.sum((data.values - median) ** 2, axis=-1)
@@ -136,12 +136,12 @@ class ForecastRunner(object):
         xts, yts = df_test.drop(['Value'], axis=1), df_test['Value'].values
         p = loaded_model.predict(xgb.DMatrix(xts))
         prediction = pd.DataFrame({'Prediction': p})
-        
+
         mape, rmse, mae, r2 = ForecastRunner.evaluation_metrics(yts, p)
         print('MAPE: {}'.format(mape))
         print('RMSE: {}'.format(rmse))
-        print('R2: {}'.format(mae))
-        print('MAE: {}'.format(r2))
+        print('R2: {}'.format(r2))
+        print('MAE: {}'.format(mae))
         mlflow.log_metric("MAPE", mape)
         mlflow.log_metric("RMSE", rmse)
         mlflow.log_metric("R2", r2)

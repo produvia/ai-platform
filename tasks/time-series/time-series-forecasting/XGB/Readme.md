@@ -20,5 +20,5 @@ Source : [data.gov.ie](https://data.gov.ie/dataset/energy-consumption-gas-and-el
 ```
 $ cd tasks/time-series/time-series-forecasting/XGB/src/
 
-$ mlflow run . -P min_child_weight=[0.8,1.2] -P colsample_bytree=[0.9] -P max_depth=[3,4] -P n_estimators=[500,1000] --no-conda
+$ mlflow run .
 ```
