@@ -18,6 +18,14 @@ class NormalizationLayer(nn.Module):
     def forward(self, x, epsilon=1e-8):
         return x * (((x**2).mean(dim=1, keepdim=True) + epsilon).rsqrt())
 
+def _upscale2d(x, factor):
+    if factor == 1:
+        return x
+    s = x.size()
+    x = x.view(-1, s[1], s[2], 1, s[3], 1)
+    x = x.expand(-1, s[1], s[2], factor, s[3], factor)
+    x = x.contiguous().view(-1, s[1], s[2] * factor, s[3] * factor)
+    return x
 
 class Upscale2d(nn.Module):
     """
@@ -31,14 +39,7 @@ class Upscale2d(nn.Module):
         self.factor = factor
 
     def forward(self, x):
-        factor = self.factor
-        if factor == 1:
-            return x
-        s = x.size()
-        x = x.view(-1, s[1], s[2], 1, s[3], 1)
-        x = x.expand(-1, s[1], s[2], factor, s[3], factor)
-        x = x.contiguous().view(-1, s[1], s[2] * factor, s[3] * factor)
-        return x
+        return _upscale2d(x, self.factor)
 
 
 class Downscale2d(nn.Module):

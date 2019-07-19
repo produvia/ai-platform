@@ -1,4 +1,5 @@
 import os
+import numpy as np
 import dnnlib.tflib, pickle, torch, collections
 from matplotlib import pyplot as plt
 import torchvision
@@ -19,6 +20,10 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
         if k[0] == 'g_synthesis':
             if not k[1].startswith('torgb'):
                 k.insert(1, 'blocks')
+            if k[1].startswith('torgb'):
+                k.insert(1, 'torgbs')
+                if k[-1] == 'weight':
+                    k.insert(3, 'module')
             k = '.'.join(k)
             k = (k.replace('const.const', 'const')
                  # early block
@@ -44,8 +49,8 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
                  .replace('conv1.stylemod.weight', 'epi1.style_mod.linear.module.weight')
                  .replace('conv1.stylemod.bias', 'epi1.style_mod.linear.bias')
                  #.replace('torgb_lod0', 'torgb')
-                 .replace('torgb_lod0.weight', 'torgb.module.weight')
-                 .replace('torgb_lod0.bias', 'torgb.bias')
+                 #.replace('torgb_lod0.weight', 'torgb_lod0.module.weight')
+                 #.replace('torgb_lod0.bias', 'torgb_lod0.bias')
                   )
         elif k[0] == 'g_mapping':
             # mapping net
@@ -54,9 +59,16 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
             k = '.'.join(k)
         # discriminator
         else:
+            if k[0].startswith('fromrgb'):
+                k.insert(0, 'fromrgbs')
+                if k[-1] == 'weight':
+                    k.insert(2, 'module')
+            else:
+                k.insert(0, 'blocks')
             k = '.'.join(k)
-            k = (k.replace('fromrgb_lod0.weight', 'fromrgb.module.weight')
-                  .replace('fromrgb_lod0.bias', 'fromrgb.bias')
+            k = (k
+                  #.replace('fromrgb_lod0.weight', 'fromrgb.module.weight')
+                  #.replace('fromrgb_lod0.bias', 'fromrgb.bias')
                   .replace('conv0.weight', 'conv0.module.weight')
                   .replace('conv1_down.weight', 'conv1_down.conv.module.weight')
                   .replace('conv1_down.bias', 'conv1_down.conv.bias')
@@ -85,8 +97,10 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
 
         checkpoint_pd = {key_translate(k, True): weight_translate(k, v) for k, v in checkpoint.items()}
 
-        # we delete the useless torgb_(1-10) and fromrgb(0-9) conv filters which are used for growing training
-        checkpoint_pd = {k: v for k, v in checkpoint_pd.items() if not ('torgb_lod' in k or 'fromrgb_lod' in k)}
+        # we delete the useless torgb_(1-9) and fromrgb(1-9) conv filters which are used for growing training
+        checkpoint_pd = {k: v for k, v in checkpoint_pd.items()
+                         if k not in (['torgb_lod{}'.format(i) for i in range(1, 9)]
+                                      + ['fromrgbs.fromrgb_lod{}'.format(i) for i in range(1, 9)])}
         for k, v in checkpoint_pd.items():
             print('checkpoint parameter ', k, v.shape)
         if 1:
@@ -143,8 +157,6 @@ if __name__ == '__main__':
                               'karras2019stylegan-{}-{}x{}.discriminator.pt'.format(url_choice, url[1], url[1]))
 
     generator = Generator(resolution=url[1])
-    print(generator)
-    pass
     discriminator = BasicDiscriminator(resolution=url[1])
 
     if to_convert:
@@ -176,9 +188,12 @@ if __name__ == '__main__':
     nrow=2
     ncol=2
 
+    resolution_log2 = int(np.log2(url[1]))
+
     latents = torch.randn(nrow * ncol, 512, device=device)
     with torch.no_grad():
-        imgs = generator(latents)
+        # alpha is 1
+        imgs = generator(latents, resolution_log2, 1)
         imgs = (imgs.clamp(-1, 1) + 1) / 2.0
 
     output_imgs = imgs
@@ -192,6 +207,7 @@ if __name__ == '__main__':
 
     discriminator.eval()
     discriminator.to(device)
-    result = discriminator(output_imgs).cpu().detach().numpy()
+    # alpha is 1
+    result = discriminator(output_imgs, resolution_log2, 1).cpu().detach().numpy()
     print(result)
 

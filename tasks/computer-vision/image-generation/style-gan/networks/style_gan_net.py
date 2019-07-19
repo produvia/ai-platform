@@ -1,9 +1,10 @@
 import numpy as np
 import torch
 import torch.nn as nn
+from torch.nn import functional as F
 from collections import OrderedDict
 from networks.custom_layers import EqualizedLinear, EqualizedConv2d, \
-    NormalizationLayer
+    NormalizationLayer, _upscale2d
 from networks.building_blocks import EarlySynthesisBlock, LaterSynthesisBlock, \
     EarlyDiscriminatorBlock, LaterDiscriminatorBlock
 
@@ -140,16 +141,37 @@ class SynthesisNet(nn.Module):
         self.blocks = nn.ModuleDict(OrderedDict(blocks))
 
 
-    def forward(self, dlatents, step=0):
-        for i, b in enumerate(self.blocks.values()):
+    def forward(self, dlatents, res, alpha):
+        assert 2 <= res <= 10
+        # step 1...9
+        step = res - 1
+        block_list = list(self.blocks.values())[:step]
+        torgb_list = list(self.torgbs.values())[:step]
+
+        # starting from 8x8 we have skip connections
+        if step > 1:
+            skip_torgb = torgb_list[-2]
+        this_rgb = torgb_list[-1]
+
+        for i, block in enumerate(block_list):
+
             if i == 0:
-                x = b(dlatents)
+                x = block(dlatents)
             else:
-                x = b(x, dlatents)
+                x = block(x, dlatents)
 
-        rgb = self.torgb(x)
+            # step - 1 is the last index
+            # so step - 2 is the second last
+            if i == step - 2:
+                # get the skip result
+                skip_x = _upscale2d(skip_torgb(x), 2)
 
-        return rgb
+        # finally for current resolution, to rgb:
+        x = this_rgb(x)
+
+        x = (1 - alpha) * skip_x + alpha * x
+
+        return x
 
 
 # a convenient wrapping class
@@ -160,8 +182,13 @@ class Generator(nn.Sequential):
             ('g_synthesis', SynthesisNet(**kwargs))
         ]))
 
+    def forward(self, latents, res, alpha):
+        dlatents = self.g_mapping(latents)
+        x = self.g_synthesis(dlatents, res, alpha)
+        return x
 
-class BasicDiscriminator(nn.Sequential):
+
+class BasicDiscriminator(nn.Module):
 
     def __init__(self,
                  num_channels       = 3,
@@ -176,6 +203,8 @@ class BasicDiscriminator(nn.Sequential):
                  fused_scale        = 'auto',
                  blur_filter        =  [1, 2, 1],
                  ):
+        super(BasicDiscriminator, self).__init__()
+
         resolution_log2: int = int(np.log2(resolution))
 
         assert resolution == 2**resolution_log2 and 4 <= resolution <= 1024
@@ -187,24 +216,52 @@ class BasicDiscriminator(nn.Sequential):
             'lrelu': nn.LeakyReLU(negative_slope=0.2)
         }[nonlinearity]
         # this is fixed. We need to grow it...
-        layers = []
-        layers.append(('fromrgb', EqualizedConv2d(num_channels, nf(resolution_log2-1), 1, use_wscale=use_wscale)))
-        layers.append(('act', act))
-        for res in range(resolution_log2, 2, -1):
-            layers.append(('{s}x{s}'.format(s=2**res), EarlyDiscriminatorBlock(res=res,
-                                                                               in_channels=nf(res-1),
-                                                                               out_channels=nf(res-2),
-                                                                               use_wscale=use_wscale,
-                                                                               blur_filter=blur_filter,
-                                                                               fused_scale=fused_scale,
-                                                                               nonlinearity=nonlinearity)))
-        layers.append(('4x4', LaterDiscriminatorBlock(in_channels=nf(2),
-                                                      out_channels=1,
-                                                      mbstd_group_size=mbstd_group_size,
-                                                      mbstd_num_features=mbstd_num_features,
-                                                      use_wscale=use_wscale,
-                                                      nonlinearity=nonlinearity,
-                                                      res=2
-                                                      )))
+        blocks = []
+        fromrgbs = []
+        for res in range(resolution_log2, 1, -1):
+            block_name = '{s}x{s}'.format(s=2 ** res)
+            fromrgb_name = 'fromrgb_lod{}'.format(resolution_log2 - res)
+            if res != 2:
+                blocks.append((block_name, EarlyDiscriminatorBlock(res=res,
+                                                                   in_channels=nf(res-1),
+                                                                   out_channels=nf(res-2),
+                                                                   use_wscale=use_wscale,
+                                                                   blur_filter=blur_filter,
+                                                                   fused_scale=fused_scale,
+                                                                   nonlinearity=nonlinearity)))
+            else:
+                blocks.append((block_name, LaterDiscriminatorBlock(in_channels=nf(res),
+                                                                   out_channels=1,
+                                                                   mbstd_group_size=mbstd_group_size,
+                                                                   mbstd_num_features=mbstd_num_features,
+                                                                   use_wscale=use_wscale,
+                                                                   nonlinearity=nonlinearity,
+                                                                   res=2,
+                                                                  )))
 
-        super().__init__(OrderedDict(layers))
+            fromrgbs.append((fromrgb_name, EqualizedConv2d(num_channels, nf(res - 1), 1, use_wscale=use_wscale)))
+
+        self.blocks = nn.ModuleDict(OrderedDict(blocks))
+        self.fromrgbs = nn.ModuleDict(OrderedDict(fromrgbs))
+
+
+    def forward(self, x, res, alpha):
+        assert 2 <= res <= 10
+        # step 1...9
+        step = res - 1
+        block_list = list(self.blocks.values())[-step:]
+        fromrgb_list = list(self.fromrgbs.values())[-step:]
+
+        if step > 1:
+            skip_fromrgb = fromrgb_list[1]
+        this_fromrgb = fromrgb_list[0]
+
+        for i, block in enumerate(block_list):
+            if i == 0:
+                skip_x = skip_fromrgb(F.avg_pool2d(x, 2))
+                x = block(this_fromrgb(x))
+                x = (1 - alpha) * skip_x + alpha * x
+            else:
+                x = block(x)
+
+        return x
