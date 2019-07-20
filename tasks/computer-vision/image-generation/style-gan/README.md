@@ -58,7 +58,7 @@ For other training options, please check the MLproject file. For hyperparameters
 ## TODO
 Due to the time limitation, I didn't implement the following:
 1. Add truncation trick
-2. Add and experiment other loss functions
+2. Add and experiment with other loss functions (some are in the repo but not tried)
 3. Add tensorboard support
 4. Add moving average of generator's weight
 
