@@ -6,7 +6,7 @@ This is a Pytorch implementation of StyleGAN, following the official implementat
 See conda.yaml. Please note that I used cuda 9.0. Change your conda.yaml accordingly if you use different cuda version.
 ### Image generation using official implementation's checkpoints
 
-**If downloading fails for Google Drive, manual download is required:**
+**This step is not needed if running the generation command succeeds for downloading.** If downloading fails for Google Drive, manual download is required:
 
 * [ffhq-1024x1024](https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ)
 * [bedrooms-256x256](https://drive.google.com/open?id=1MOSKeGF0FJcivpBI7s63V9YHloUTORiF)
