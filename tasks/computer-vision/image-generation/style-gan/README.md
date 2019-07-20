@@ -23,17 +23,25 @@ mlflow -e generate . -P dataset=cats
 ```
 The default random seed is 77. To generate different images with different image grid (note that the number of images you can generate is limited by your GPU).
 ```bash
-mlflow -e generate -P datasets=cats -P random_seed=777 -P nrow=2 -P ncol=5
+mlflow -e generate -P dataset=cats -P random-seed=777 -P nrow=2 -P ncol=5
 ```
 This will generate 15 images at once.
 
 ## Training on CelebA dataset
-Run the command:
+Run the command to start from scratch:
 ```bash
-mlflow -e train . -P data_root='./data/celeba' -P resolution=128 -P n_gpus=1
+mlflow -e train . -P resume=False
 ```
 This will kick off the training for 128x128 resolution on CelebA dataset. During training, the model checkpoints are stored under ./checkpoints, and the fake images are generated for checking under ./checks/fake\_imgs. Note that this is a progressive process starting from 8x8, so you will see 8x8 images in the begining and 128x128 images in the end of the training process. 
 
+To resume training:
+```bash
+mlflow -e train .\
+       -P resume=True \
+       -P g_checkpoint=[path_to_generator_checkpoint] \
+       -P d_checkpoint=[path_to_discriminator_checkpoint]
+```
+For other training options, please check the MLproject file. For hyperparameters, please check train.py and NVidia's official implementation.
 
 ## TODO
 Due to the time limitation, I didn't implement the following:
@@ -42,6 +50,6 @@ Due to the time limitation, I didn't implement the following:
 3. Add tensorboard support
 4. Add moving average of generator's weight
 
-**All of the above are not vital to get visually good results, but are implemented in the official tensorflow implemenation.**
+**None of the above is vital to get visually good results, but are implemented in the official TensorFlow implementation.**
 
 Multi-GPU support is added but not experimented due to hardware limitation.

@@ -1,10 +1,12 @@
-# the easiest training script
-
+from __future__ import print_function
 import os
+import argparse
+import time
 import numpy as np
 import pathlib
 import torch
 import torch.optim as optim
+import torch.nn as nn
 import torch.utils.data
 import torchvision.datasets as dset
 import torchvision.transforms as transforms
@@ -13,7 +15,28 @@ from dnnlib import EasyDict
 from networks.style_gan_net import Generator, BasicDiscriminator
 from loss_criterions.gradient_losses import logisticGradientPenalty
 from loss_criterions.base_loss_criterions import Logistic
-import time
+from utils import str2bool
+import mlflow
+
+# command line arguments
+parser = argparse.ArgumentParser(description='Pytorch style-gan training')
+
+parser.add_argument('--data-root', type=str, help='image data root directory')
+
+parser.add_argument('--resume', type=str2bool, nargs='?', help='resume training')
+
+parser.add_argument('--g-checkpoint', type=str,
+                    help='generator checkpoint path for continuing training when resume is set to True')
+parser.add_argument('--d-checkpoint', type=str,
+                    help='discriminator checkpoint path for continuing training when resume is set to True')
+
+parser.add_argument('--target-resolution', type=int, help='target resolution for training (default: 128)')
+
+parser.add_argument('--n-gpu', type=int, help='number of gpus for training (default: 1)')
+
+args = parser.parse_args()
+
+
 real_label = 1
 fake_label = 0
 
@@ -21,6 +44,28 @@ fake_label = 0
 def set_grad_flag(module, flag):
     for p in module.parameters():
         p.requires_grad = flag
+
+
+def get_resume_info_from_checkpoint(g_checkpoint,
+                                    d_checkpoint
+                                    ):
+
+    def get_info(file_path):
+        info_dict = {}
+        parts = os.path.basename(file_path).split('.')
+        info_dict['resolution'] = int(parts[1].split('x')[0])
+        # alpha is float and has a '.'
+        info_dict['alpha'] = float(parts[2] + '.' + parts[3])
+        info_dict['cur_nimg'] = int(parts[4])
+        info_dict['cur_tick'] = int(parts[5])
+
+        return info_dict
+
+    g_info = get_info(g_checkpoint)
+    d_info = get_info(d_checkpoint)
+    return g_info, d_info
+
+
 
 
 def training_schedule(cur_nimg,
@@ -96,20 +141,33 @@ def train_loop(generator,
                target_resolution_log2=1024,
                num_gpus=1,
                total_kimg=15000,  # Total length of the training, measured in thousands of real images
-               image_snapshot_ticks = 1, # How often to export images
+               image_snapshot_ticks=2, # How often to export images
                device='cuda:0',
+               cur_nimg=0,
+               cur_tick=0,
+               prev_resolution=0,
                output_dir='./checks/fake_imgs',
-               checkpoint_dir='./checkpoints/'):
+               checkpoint_dir='./checkpoints/',
+               ):
 
     pathlib.Path(output_dir).mkdir(parents=True, exist_ok=True)
     pathlib.Path(checkpoint_dir).mkdir(parents=True, exist_ok=True)
+    # don't do 1
 
-    fixed_noise = torch.randn(10, 512, device=device)
-    cur_nimg = 0
     tick_start_nimg = cur_nimg
-    prev_resolution = 0
-    cur_tick = 0
+
+    is_resume_training = False
+    if cur_nimg != 0:
+        is_resume_training = True
+        resumed_tick = cur_tick
+    else:
+        # to always make resumed_tick != current_tick
+        resumed_tick = -1
+
+    # for resuming, we don't count previous training's time, which can be fixed
     total_time = .0
+    if cur_nimg != 0:
+        print('resuming training from tick %d' % cur_tick)
     while cur_nimg < total_kimg * 1000:
         start_time = time.time()
         shed = training_schedule(cur_nimg,
@@ -123,7 +181,7 @@ def train_loop(generator,
                                  D_lrate_dict=D_lrate_dict,
                                  D_lrate_base=D_lrate_base,
                                  )
-        if prev_resolution != shed.resolution:
+        if prev_resolution != shed.resolution or is_resume_training:
             # need new size - need a better way
             dataset = dset.ImageFolder(root=data_root,
                                        transform=transforms.Compose([
@@ -132,6 +190,7 @@ def train_loop(generator,
                                                  transforms.ToTensor(),
                                                  transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
                                ]))
+            is_resume_training = False
 
             # make sure shuffle is True
             dataloader = torch.utils.data.DataLoader(dataset, batch_size=shed.minibatch, shuffle=True, num_workers=4)
@@ -203,42 +262,54 @@ def train_loop(generator,
                 print('resolution: %d, alpha: %.3f' % (shed.resolution, shed.alpha))
 
                 print('loss_d %.6f, loss_g %.6f' % (loss_d.item(), loss_fake_g.item()))
-            if cur_tick % image_snapshot_ticks == 0 or done:
-                with torch.no_grad():
-                    fakes = generator(fixed_noise, shed.resolution_log2, shed.alpha)
-                vutils.save_image(fakes,
-                                  os.path.join(output_dir, 'sample_{}.png'.format(cur_tick)),
-                                  padding=2, nrow=5, normalize=True)
-                torch.save(generator.state_dict(),
-                           os.path.join(checkpoint_dir,
-                                        'generator.%dx%d.%.6f.%-5d.pt' % (shed.resolution,
-                                                                          shed.resolution,
-                                                                          shed.alpha,
-                                                                          cur_tick
-                                                                       )))
-                torch.save(discriminator.state_dict(),
-                           os.path.join(checkpoint_dir,
-                                        'discriminator.%dx%d.%.6f.%-5d.pt' % (shed.resolution,
+                if (cur_tick % image_snapshot_ticks == 0 or done) and (resumed_tick != cur_tick):
+                    fixed_noise = torch.randn(10, 512, device=device)
+                    with torch.no_grad():
+                        fakes = generator(fixed_noise, shed.resolution_log2, shed.alpha)
+                    print('saving fake images and checkpoints at tick %d' % cur_tick)
+                    vutils.save_image(fakes,
+                                      os.path.join(output_dir, 'sample_{}.png'.format(cur_tick)),
+                                      padding=2, nrow=5, normalize=True)
+                    torch.save(generator.state_dict(),
+                               os.path.join(checkpoint_dir,
+                                            'generator.%dx%d.%.6f.%d.%d.pt' % (shed.resolution,
                                                                               shed.resolution,
                                                                               shed.alpha,
+                                                                              cur_nimg,
                                                                               cur_tick
-                                                                       )))
-
+                                                                           )))
+                    torch.save(discriminator.state_dict(),
+                               os.path.join(checkpoint_dir,
+                                            'discriminator.%dx%d.%.6f.%d.%d.pt' % (shed.resolution,
+                                                                                  shed.resolution,
+                                                                                  shed.alpha,
+                                                                                  cur_nimg,
+                                                                                  cur_tick
+                                                                           )))
 
 
 if __name__ == '__main__':
-    data_root = './data/celeba'
-    resolution = 128
+    ############# cmd line parameters ##########
+    data_root = args.data_root
+    resume_training = args.resume
+    if resume_training:
+        g_checkpoint_path = args.g_checkpoint
+        d_checkpoint_path = args.d_checkpoint
+
+    resolution = args.target_resolution
+    n_gpu = args.n_gpu
+    ############################################
+
+    # other configs
     batch_size = 16
     num_workers = 4
-    # TODO: parallelization for multi-gpu
-    n_gpu = 1
     # num_epochs = 1000
     g_lr_base = 0.001
     g_lr_dict = {128: 0.0015, 256: 0.002, 512: 0.003, 1024: 0.003}
     d_lr_base = 0.001
     d_lr_dict = g_lr_dict
-    # 1 GPU
+    # 1 GPU setting
+    # NOTE for multi-gpu settings, please check official TF implementation
     minibatch_base = 4
     minibatch_dict = {4: 128, 8: 128, 16: 128, 32: 64, 64: 32, 128: 16, 256: 8, 512: 4}
     g_opt_dict = {'beta1': .0, 'beta2': 0.99, 'eplilon': 1e-8}
@@ -251,47 +322,82 @@ if __name__ == '__main__':
 
     logistic_grad_weight = r1_gamma / 2.0
 
-    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+    device = 'cuda:0' if (torch.cuda.is_available() and n_gpu > 0) else 'cpu'
 
-    print('Construting networks...')
-    generator = Generator(resolution=resolution)
-    generator.to(device)
-    discriminator = BasicDiscriminator(resolution=resolution)
-    discriminator.to(device)
+    with mlflow.start_run():
 
-    d_loss = logisticGradientPenalty
-    g_loss = Logistic(device=device).getCriterion
+        for key, value in vars(args).items():
+            mlflow.log_param(key, value)
+        print('Construting networks...')
 
-    g_optimizer = optim.Adam(generator.parameters(),
-                             betas=(g_opt_dict['beta1'],
-                             g_opt_dict['beta2']),
-                             eps=g_opt_dict['eplilon'])
+        generator = Generator(resolution=resolution)
+        generator.to(device)
 
-    d_optimizer = optim.Adam(discriminator.parameters(),
-                             betas=(d_opt_dict['beta1'],
-                                    d_opt_dict['beta2']),
-                             eps=d_opt_dict['eplilon'])
+        discriminator = BasicDiscriminator(resolution=resolution)
+        discriminator.to(device)
 
-    print('starting training loop...')
-    train_loop(generator,
-               discriminator,
-               g_optimizer,
-               d_optimizer,
-               g_loss=g_loss,
-               d_loss=d_loss,
-               initial_resolution=initial_resolution,
-               data_root=data_root,
-               minibatch_dict=minibatch_dict,
-               max_minibatch_per_gpu={},
-               G_lrate_dict=g_lr_dict,
-               G_lrate_base=g_lr_base,
-               D_lrate_dict=d_lr_dict,
-               D_lrate_base=d_lr_base,
-               target_resolution_log2=64,       # only gtx 1070, even using 64 is slow
-               num_gpus=1,
-               total_kimg=4000,
-               image_snapshot_ticks=10,
-               device=device,
-               )
+        # multi-gpu support
+        if device == 'cuda:0' and n_gpu > 1:
+            generator = nn.DataParallel(generator, list(range(n_gpu)))
+            discriminator = nn.DataParallel(discriminator, list(range(n_gpu)))
+
+        d_loss = logisticGradientPenalty
+        g_loss = Logistic(device=device).getCriterion
+
+        g_optimizer = optim.Adam(generator.parameters(),
+                                 betas=(g_opt_dict['beta1'],
+                                 g_opt_dict['beta2']),
+                                 eps=g_opt_dict['eplilon'])
+
+        d_optimizer = optim.Adam(discriminator.parameters(),
+                                 betas=(d_opt_dict['beta1'],
+                                        d_opt_dict['beta2']),
+                                 eps=d_opt_dict['eplilon'])
+
+
+        # these are for resuming training
+        cur_nimg = 0
+        cur_tick = 0
+        prev_resolution = 0
+        print('starting training loop...')
+        if resume_training:
+            try:
+                g_info, d_info = get_resume_info_from_checkpoint(g_checkpoint_path, d_checkpoint_path)
+                generator.load_state_dict(torch.load(g_checkpoint_path))
+                discriminator.load_state_dict(torch.load(d_checkpoint_path))
+                cur_nimg = g_info['cur_nimg']
+                cur_tick = g_info['cur_tick']
+                prev_resolution = g_info['resolution']
+            except:
+                print('Resume training failed!!!')
+                cur_nimg = 0
+                cur_tick = 0
+                prev_resolution = -1
+
+        train_loop(generator,
+                   discriminator,
+                   g_optimizer,
+                   d_optimizer,
+                   g_loss=g_loss,
+                   d_loss=d_loss,
+                   initial_resolution=initial_resolution,
+                   data_root=data_root,
+                   minibatch_dict=minibatch_dict,
+                   # this is empty for 1 gpu
+                   # for multi-gpu, look at the official TF implementation
+                   max_minibatch_per_gpu={},
+                   G_lrate_dict=g_lr_dict,
+                   G_lrate_base=g_lr_base,
+                   D_lrate_dict=d_lr_dict,
+                   D_lrate_base=d_lr_base,
+                   target_resolution_log2=64,       # only gtx 1070, even using 64 is slow
+                   num_gpus=1,
+                   total_kimg=4000,
+                   image_snapshot_ticks=1,
+                   device=device,
+                   cur_nimg=cur_nimg,
+                   cur_tick=cur_tick,
+                   prev_resolution=prev_resolution
+                   )
 
 

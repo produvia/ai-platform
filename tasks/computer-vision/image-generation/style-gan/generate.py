@@ -1,9 +1,42 @@
+from __future__ import print_function
+import argparse
 import os
 import numpy as np
 import dnnlib.tflib, pickle, torch, collections
 from matplotlib import pyplot as plt
 import torchvision
 from networks.style_gan_net import Generator, BasicDiscriminator
+from utils import str2bool
+import mlflow
+
+# command line arguments
+parser = argparse.ArgumentParser(description='Pytorch style-gan image generation')
+
+parser.add_argument('--convert', type=str2bool,
+                    help='convert the official tf checkpoints to my pytorch checkpoints', required=False)
+
+parser.add_argument('--use-official-checkpoints', type=str2bool,
+                    help='use official tf checkpoints', required=False)
+
+parser.add_argument('--random-seed', type=int,
+                    help='random seed for generating latent', required=False)
+
+parser.add_argument('--dataset', type=str, default='ffhq',
+                    help='random seed for generating latent', required=False)
+
+parser.add_argument('--g-checkpoint', type=str,
+                    help='generator checkpoint file path')
+
+parser.add_argument('--target-resolution', type=int,
+                    help='target resolution. Can be different from trained resolution which is from the checkpoint')
+
+parser.add_argument('--nrow', type=int,
+                    help='number of rows for the image grid')
+
+parser.add_argument('--ncol', type=int,
+                    help='number of columns for the image grid')
+
+args = parser.parse_args()
 
 def convert(weights, generator, g_out_file, discriminator, d_out_file):
     # get the weights
@@ -92,17 +125,19 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
 
     # TODO: Note that for training, our structure is fixed. Needs to support growing.
     def translate_checkpoint_with_defined(checkpoint, defined):
-        for k, v in checkpoint.items():
-            print('original key in checkpoint: ', k)
+        if 0:
+            for k, v in checkpoint.items():
+                print('original key in checkpoint: ', k)
 
-        checkpoint_pd = {key_translate(k, True): weight_translate(k, v) for k, v in checkpoint.items()}
+        checkpoint_pd = {key_translate(k): weight_translate(k, v) for k, v in checkpoint.items()}
 
         # we delete the useless torgb_(1-9) and fromrgb(1-9) conv filters which are used for growing training
         checkpoint_pd = {k: v for k, v in checkpoint_pd.items()
                          if k not in (['torgb_lod{}'.format(i) for i in range(1, 9)]
                                       + ['fromrgbs.fromrgb_lod{}'.format(i) for i in range(1, 9)])}
-        for k, v in checkpoint_pd.items():
-            print('checkpoint parameter ', k, v.shape)
+        if 0:
+            for k, v in checkpoint_pd.items():
+                print('checkpoint parameter ', k, v.shape)
         if 1:
             defined_shapes = {k: v.shape for k, v in defined.state_dict().items()}
             param_shapes = {k: v.shape for k, v in checkpoint_pd.items()}
@@ -131,83 +166,126 @@ def convert(weights, generator, g_out_file, discriminator, d_out_file):
         torch.save(discriminator.state_dict(), d_out_file)
 
 
+def get_info(file_path):
+    info_dict = {}
+    parts = os.path.basename(file_path).split('.')
+    info_dict['resolution'] = int(parts[1].split('x')[0])
+    # alpha is float and has a '.'
+    info_dict['alpha'] = float(parts[2] + '.' + parts[3])
+    info_dict['cur_nimg'] = int(parts[4])
+    info_dict['cur_tick'] = int(parts[5])
+
+    return info_dict
+
 
 if __name__ == '__main__':
-    to_convert = False
-    # changes this accordingly
-    url_choice = 'bedrooms'
-    checkpoint_prefix = 'kerras2019stylegan'
-    url = {'cats': ('https://drive.google.com/uc?id=1MQywl0FNt6lHu8E_EUqnRbviagS7fbiJ',
-                    256,
-                    '1c6bbbad79102cf05f29ec0363071cf3'),
-           'bedrooms': ('https://drive.google.com/uc?id=1MOSKeGF0FJcivpBI7s63V9YHloUTORiF',
+    ##### cmd line arguments #####
+    to_convert = args.convert
+    use_official_checkpoints = args.use_official_checkpoints
+    random_seed = args.random_seed
+    nrow = args.nrow
+    ncol = args.ncol
+    if not use_official_checkpoints:
+        g_out_file = args.g_checkpoint
+        info = get_info(g_out_file)
+        alpha = info['alpha']
+        # this is hard coded
+        resolution = args.target_resolution
+        trained_resolution = info['resolution']
+        generator = Generator(resolution=resolution)
+
+    else:
+        #############################
+        # changes this accordingly
+        dataset = args.dataset
+        checkpoint_prefix = 'kerras2019stylegan'
+        alpha = 1.0
+        url = {'cats': ('https://drive.google.com/uc?id=1MQywl0FNt6lHu8E_EUqnRbviagS7fbiJ',
                         256,
-                        '258371067819a08c899eeb7d1d2c8c19'
-                        ),
-           'ffhq': ('https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ',
-                    1024,
-                    '263e666dc20e26dcbfa514733c1d1f81'
-                    )
-           }[url_choice]
+                        '1c6bbbad79102cf05f29ec0363071cf3'),
+               'bedrooms': ('https://drive.google.com/uc?id=1MOSKeGF0FJcivpBI7s63V9YHloUTORiF',
+                            256,
+                            '258371067819a08c899eeb7d1d2c8c19'
+                            ),
+               'ffhq': ('https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ',
+                        1024,
+                        '263e666dc20e26dcbfa514733c1d1f81'
+                        )
+               }[dataset]
 
-    pretrained_dir = 'pretrained'
-    g_out_file = os.path.join(pretrained_dir,
-                              'karras2019stylegan-{}-{}x{}.generator.pt'.format(url_choice, url[1], url[1]))
-    d_out_file = os.path.join(pretrained_dir,
-                              'karras2019stylegan-{}-{}x{}.discriminator.pt'.format(url_choice, url[1], url[1]))
+        pretrained_dir = 'pretrained'
+        resolution = url[1]
+        g_out_file = os.path.join(pretrained_dir,
+                                  'karras2019stylegan-{}-{}x{}.generator.pt'.format(dataset, resolution, resolution))
+        generator = Generator(resolution=resolution)
 
-    generator = Generator(resolution=url[1])
-    discriminator = BasicDiscriminator(resolution=url[1])
+        discriminator = None
+        d_out_file = None
+        trained_resolution = resolution
+        if 0:
+            d_out_file = os.path.join(pretrained_dir,
+                                    'karras2019stylegan-{}-{}x{}.discriminator.pt'.format(dataset, resolution, resolution))
+        if 0:
+            discriminator = BasicDiscriminator(resolution=resolution)
 
-    if to_convert:
-        # init tf
-        print('start conversion')
-        dnnlib.tflib.init_tf()
-        try:
-            with dnnlib.util.open_url(url[0], cache_dir=pretrained_dir) as f:
-                weights = pickle.load(f)
+        if to_convert:
+            # init tf
+            print('start conversion')
+            dnnlib.tflib.init_tf()
+            try:
+                with dnnlib.util.open_url(url[0], cache_dir=pretrained_dir) as f:
+                    weights = pickle.load(f)
 
-        except:
-            weights = pickle.load(open(os.path.join(pretrained_dir,
-                                                    'karras2019stylegan-{}-{}x{}.pkl'.format(url_choice, url[1], url[1]))))
-        convert(weights,
-                generator=generator,
-                g_out_file=g_out_file,
-                discriminator=discriminator,
-                d_out_file=d_out_file)
+            except:
+                weights = pickle.load(open(os.path.join(pretrained_dir,
+                                                        'karras2019stylegan-{}-{}x{}.pkl'.format(dataset, resolution, resolution))))
+            convert(weights,
+                    generator=generator,
+                    g_out_file=g_out_file,
+                    discriminator=discriminator,
+                    d_out_file=d_out_file)
 
-        print('finished conversion')
+            print('finished conversion')
 
-    generator.load_state_dict(torch.load(g_out_file))
+    with mlflow.start_run():
 
-    device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
+        for key, value in vars(args).items():
+            mlflow.log_param(key, value)
 
-    generator.eval()
-    generator.to(device)
-    torch.manual_seed(77)
-    nrow=2
-    ncol=2
+        generator.load_state_dict(torch.load(g_out_file))
 
-    resolution_log2 = int(np.log2(url[1]))
+        device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
 
-    latents = torch.randn(nrow * ncol, 512, device=device)
-    with torch.no_grad():
-        # alpha is 1
-        imgs = generator(latents, resolution_log2, 1)
-        imgs = (imgs.clamp(-1, 1) + 1) / 2.0
+        generator.eval()
+        generator.to(device)
+        torch.manual_seed(random_seed)
 
-    output_imgs = imgs
-    imgs = torchvision.utils.make_grid(output_imgs.cpu(), nrow=nrow)
+        resolution_log2 = int(np.log2(trained_resolution))
 
-    plt.figure(figsize=(30, 12))
-    plt.imshow(imgs.permute(1, 2, 0).detach().numpy())
-    plt.show()
+        latents = torch.randn(nrow * ncol, 512, device=device)
+        with torch.no_grad():
+            # alpha is 1
+            imgs = generator(latents, resolution_log2, alpha)
+            imgs = (imgs.clamp(-1, 1) + 1) / 2.0
 
-    discriminator.load_state_dict(torch.load(d_out_file))
 
-    discriminator.eval()
-    discriminator.to(device)
-    # alpha is 1
-    result = discriminator(output_imgs, resolution_log2, 1).cpu().detach().numpy()
-    print(result)
+        output_imgs = imgs
+        imgs = torchvision.utils.make_grid(output_imgs.cpu(), nrow=ncol, normalize=True)
+
+        # torchvision.utils.save_image(imgs, 'sample_00.png', padding=2, nrow=nrow, normalize=True)
+        plt.figure(figsize=(30, 12))
+        #if use_official_checkpoints:
+        imgs = imgs.permute(1, 2, 0)
+        plt.imshow(imgs.detach().numpy())
+        plt.show()
+
+        if 0:
+            discriminator.load_state_dict(torch.load(d_out_file))
+
+            discriminator.eval()
+            discriminator.to(device)
+            # alpha is 1
+            result = discriminator(output_imgs, resolution_log2, 1).cpu().detach().numpy()
+            print(result)
+
 
