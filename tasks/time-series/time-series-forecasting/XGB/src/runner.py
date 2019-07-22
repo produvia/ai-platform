@@ -16,10 +16,10 @@ class ForecastRunner(object):
         self.url = url
         self.output_file = output_file
         self.predicted_date = predicted_date
-        self.min_child_weight = [float(i) for i in eval(min_child_weight)]
-        self.colsample_bytree = [float(i) for i in eval(colsample_bytree)]
-        self.max_depth = [int(i) for i in eval(max_depth)]
-        self.n_estimators = [int(i) for i in eval(n_estimators)]
+        self.min_child_weight = [float(i) for i in eval(str(min_child_weight))]
+        self.colsample_bytree = [float(i) for i in eval(str(colsample_bytree))]
+        self.max_depth = [int(i) for i in eval(str(max_depth))]
+        self.n_estimators = [int(i) for i in eval(str(n_estimators))]
 
     def get_input(self):
         s = requests.get(self.url).content
