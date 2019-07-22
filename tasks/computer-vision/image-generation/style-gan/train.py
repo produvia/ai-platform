@@ -138,7 +138,7 @@ def train_loop(generator,
                G_lrate_base,
                D_lrate_dict,
                D_lrate_base,
-               target_resolution_log2=1024,
+               target_resolution_log2=10,
                num_gpus=1,
                total_kimg=15000,  # Total length of the training, measured in thousands of real images
                image_snapshot_ticks=2, # How often to export images
@@ -390,9 +390,9 @@ if __name__ == '__main__':
                    G_lrate_base=g_lr_base,
                    D_lrate_dict=d_lr_dict,
                    D_lrate_base=d_lr_base,
-                   target_resolution_log2=64,       # only gtx 1070, even using 64 is slow
+                   target_resolution_log2=int(np.sqrt(resolution)),       # only gtx 1070, even using 64 is slow
                    num_gpus=1,
-                   total_kimg=4000,
+                   total_kimg=12000,
                    image_snapshot_ticks=1,
                    device=device,
                    cur_nimg=cur_nimg,

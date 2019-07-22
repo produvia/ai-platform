@@ -11,7 +11,7 @@ entry_points:
       dataset: {type: string, default: ffhq}
       nrow: {type: int, default: 2}
       ncol: {type: int, default: 2}
-      g_checkpoint: {type: string, default: ./checkpoints/generator.32x32.0.002187.1820000.76.pt}
+      g_checkpoint: {type: string, default: ./checkpoints/generator.32x32.1.000000.3000000.135.pt}
       target_resolution: {type: int, default: 128}
     command: |
           python generate.py \
@@ -28,8 +28,8 @@ entry_points:
     parameters:
       data_root: {type: string, default: ./data/celeba}
       resume: {type: string, default: True}
-      g_checkpoint: {type: string, default: ./checkpoints/generator.32x32.0.002187.1820000.76.pt}
-      d_checkpoint: {type: string, default: ./checkpoints/discriminator.32x32.0.002187.1820000.76.pt}
+      g_checkpoint: {type: string, default: ./checkpoints/generator.32x32.1.000000.3000000.135.pt}
+      d_checkpoint: {type: string, default: ./checkpoints/discriminator.32x32.1.000000.3000000.135.pt}
       target_resolution: {type: int, default: 128}
       n_gpu: {type: int, default: 1}
     command: |
