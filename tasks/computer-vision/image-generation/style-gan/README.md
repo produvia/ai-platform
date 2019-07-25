@@ -3,7 +3,7 @@ This is a Pytorch implementation of StyleGAN, following the official implementat
 
 ## Prerequisites
 ### Dependencies
-See conda.yaml. Please note that I used cuda 9.0. Change your conda.yaml accordingly if you use different cuda version.
+See conda.yaml. Please note that I have cuda 10.0 installed. Change your conda.yaml accordingly if you use different cuda version.
 ### Image generation using official implementation's checkpoints
 
 **This step is not needed if running the generation command succeeds for downloading.** If downloading fails for Google Drive, manual download is required:
@@ -56,7 +56,6 @@ mlflow -e train .\
 For other training options, please check the MLproject file. For hyperparameters, please check train.py and NVidia's official implementation.
 
 ## TODO
-Due to the time limitation, I didn't implement the following:
 1. Add truncation trick
 2. Add and experiment with other loss functions (some are in the repo but not tried)
 3. Add tensorboard support
