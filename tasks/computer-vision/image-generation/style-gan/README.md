@@ -1,5 +1,5 @@
 # StyleGAN Pytorch Implementation
-This is a Pytorch implementation of StyleGAN, following the official implementation as much as possible.
+This is a Pytorch implementation of StyleGAN.
 
 ## Prerequisites
 ### Dependencies
@@ -60,7 +60,5 @@ For other training options, please check the MLproject file. For hyperparameters
 2. Add and experiment with other loss functions (some are in the repo but not tried)
 3. Add tensorboard support
 4. Add moving average of generator's weight
-
-**None of the above is vital to get visually good results, but are implemented in the official TensorFlow implementation.**
 
 Multi-GPU support is added but not experimented due to hardware limitation.
