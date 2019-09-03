@@ -49,11 +49,13 @@ torch.manual_seed(args.seed)
 if args.cuda:
 	torch.cuda.manual_seed(args.seed)
 
+cifar_train_mean = (0.5070751592371323, 0.48654887331495095, 0.4409178433670343)
+cifar_train_std = (0.2673342858792401, 0.2564384629170883, 0.27615047132568404)
 train_loader = torch.utils.data.DataLoader(
 	datasets.CIFAR('../data', train=True, download=True,
 					transform=transforms.Compose([
 					transforms.toTensor(),
-					transforms.Normalize()
+					transforms.Normalize(mean=cifar_train_mean, std=cifar_train_std)
 					])),
 	batch_size=args.batch_size, shuffle=True, pin_memory=True)
 
@@ -62,7 +64,7 @@ test_loader = torch.utils.data.DataLoader(
 	datasets.CIFAR('../data', train=False, download=True,
 					transform=transforms.Compose([
 					transforms.toTensor(),
-					transforms.Normalize()
+					transforms.Normalize(cifar_train_mean,cifar_train_std)
 					])),
 	batch_size=args.batch_size, shuffle=True, pin_memory=True)
 
