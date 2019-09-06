@@ -34,6 +34,8 @@ parser.add_argument('--log-interval', type=int, default=100, metavar='N',
                     help='how many batches to wait before logging training status')
 args = parser.parse_args()
 
+if not os.path.isdir('models'):
+    os.makedirs('models')
 
 cuda = True if args.enable_cuda == 'True' else False
 
