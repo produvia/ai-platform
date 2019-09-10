@@ -1,8 +1,11 @@
 # Computer Vision Tasks
 
-1. Semantic Segmentation
+Tasks sorted by title:
+
+1. Denoising
 2. Image Classification
-3. Object Detection
-4. Image Generation
-5. Denoising
-6. Super Resolution
+3. Image Generation
+4. In stance Segmentation
+5. Object Detection
+6. Semantic Segmentation
+7. Super Resolution
