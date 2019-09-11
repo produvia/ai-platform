@@ -1,5 +1,6 @@
 import warnings
 import sys
+import os
 
 from keras.datasets import cifar10
 import numpy as np
@@ -19,12 +20,16 @@ if __name__ == "__main__":
     # Read command line inputs
     samples_per_class = int(sys.argv[1]) if len(sys.argv) > 1 else 300
     retrain_cnn_layers = int(sys.argv[2]) if len(sys.argv) > 2 else 0
+    use_early_stop = int(sys.argv[3]) if len(sys.argv) > 3 else 1
+    max_epochs = int(sys.argv[4]) if len(sys.argv) > 4 else 20
 
     with mlflow.start_run():
 
         # log mlflow parameters
         mlflow.log_param("retrain_cnn_layers", retrain_cnn_layers)  
         mlflow.log_param("samples_per_class", samples_per_class)
+        mlflow.log_param("use_early_stop", use_early_stop)  
+        mlflow.log_param("max_epochs", max_epochs)
 
         # load CIFAR10 dataset
         (train_data, train_labels), (test_data, test_labels) = cifar10.load_data()
@@ -83,18 +88,26 @@ if __name__ == "__main__":
                     loss='categorical_crossentropy',
                     metrics=['accuracy'])
 
-        # use early stop to avoid overfitting
-        callbacks = [EarlyStopping(monitor='val_loss', patience=2)]
-
+        
         # train the model with training data (subset of total)
         # use the validation datasets to monitor training
-        # maximum of 20 epocs, batch size 32
-        history = pre_trained_model.fit(x_train,
-                                        y_train,
-                                        epochs=20,
-                                        callbacks=callbacks,
-                                        batch_size=32,
-                                        validation_data=(x_val,y_val))
+        if use_early_stop > 0:
+            # use early stop to avoid overfitting
+            callbacks = [EarlyStopping(monitor='val_loss', patience=2)]
+            history = pre_trained_model.fit(x_train,
+                                            y_train,
+                                            epochs=max_epochs,
+                                            callbacks=callbacks,
+                                            batch_size=32,
+                                            validation_data=(x_val,y_val))
+        else:
+            # train with fixed number of epochs
+            history = pre_trained_model.fit(x_train,
+                                            y_train,
+                                            epochs=max_epochs,
+                                            batch_size=32,
+                                            validation_data=(x_val,y_val))
+        
 
         # evaluate model performance with the unseen test dataset
         test_loss, test_acc = pre_trained_model.evaluate(x_test,y_test)
@@ -103,7 +116,10 @@ if __name__ == "__main__":
         print('Test accuracy {}, Test loss {}'.format(test_acc,test_loss))
 
         # saving model weights
-        pre_trained_model.save_weights('model_weights/model.h5')
+        output_folder = './model_weights'
+        if not os.path.exists(output_folder):
+            os.makedirs(output_folder)
+        pre_trained_model.save_weights(output_folder + '/model.h5')
 
         # log mlflow metrics
         mlflow.log_metric("training_set", train_data_subset.shape[0])

@@ -23,9 +23,9 @@ Running the model transfers the knowledge in the convolutional layers from VGG16
 
 Using mlflow:
 
-`mlflow run . -P samples_per_class=300 -P retrained_conv_layers=0`
+`mlflow run . -P samples_per_class=300 -P retrained_conv_layers=0 -P use_early_stop=1 -P max_epochs=20`
 
-By default, samples_per class is 300 and retrained_conv_layers is 0. samples_per_class is used to speed up training by only selecting a subset of samples per class to train on. retrained_conv_layers is used to determined how many of the final convolutional layers transferred should be retrained.
+By default, samples_per class is 300, retrained_conv_layers is 0, use_early_stop is 1 (true) and max_epochs is 20. samples_per_class is used to speed up training by only selecting a subset of samples per class to train on. retrained_conv_layers is used to determined how many of the final convolutional layers transferred should be retrained. use_early_stop decides whether training should use early stop (to avoid overfitting). max_epochs limits the maximum number of training epochs.
 
 
 

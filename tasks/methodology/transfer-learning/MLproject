@@ -7,6 +7,7 @@ entry_points:
     parameters:
       samples_per_class: {type: integer, default: 300}
       retrained_conv_layers: {type: integer, default: 0}
+      use_early_stop: {type: integer, default: 1}
+      max_epochs: {type: integer, default: 20}
 
-
-    command: "python transfer_learning.py {samples_per_class} {retrained_conv_layers}"
+    command: "python transfer_learning.py {samples_per_class} {retrained_conv_layers} {use_early_stop} {max_epochs}"
