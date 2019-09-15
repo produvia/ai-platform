@@ -3,9 +3,10 @@
 Tasks sorted by title:
 
 - Denoising
+- Face Generation
 - Image Classification
 - Image Generation
-- In stance Segmentation
+- Instance Segmentation
 - Object Detection
 - Semantic Segmentation
 - Super Resolution
