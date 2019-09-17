@@ -1,3 +1,5 @@
+AI-Platform UUID: `bdb45445-61bb-4a93-9c6d-9d71d2b5bf59`
+
 # Transfer Learning
 
 ## Goal
