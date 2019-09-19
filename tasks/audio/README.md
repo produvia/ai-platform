@@ -6,4 +6,5 @@ Tasks sorted by title:
 - Audio Classification
 - Audio Generation
 - Audio Tagging
+- Music Generation
 - Sound Event Detection
