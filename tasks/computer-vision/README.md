@@ -9,4 +9,5 @@ Tasks sorted by title:
 - Instance Segmentation
 - Object Detection
 - Semantic Segmentation
+- Style Transfer
 - Super Resolution

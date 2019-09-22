@@ -2,10 +2,11 @@
 
 Tasks sorted by title:
 
-- Language Modelling
+- Language Modeling
 - Machine Translation
 - Named Entity Recognition
 - Question Answering
 - Relation Extraction
 - Sentiment Analysis
 - Text Classification
+- Text Generation
