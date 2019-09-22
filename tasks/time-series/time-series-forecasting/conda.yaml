@@ -1,4 +1,4 @@
-name: base
+name: time-series-forecasting
 channels:
   - defaults
 dependencies:

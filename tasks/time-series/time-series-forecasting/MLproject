@@ -2,7 +2,7 @@ name: time-series-forecasting
 
 conda_env: conda.yaml
 
-entry_points:  
+entry_points:
   main:
     parameters:
       city: {type: string, default: 'Hamburg'}
@@ -10,5 +10,5 @@ entry_points:
 
   train_weathernet:
     parameters:
-      city: {type: string, default: 'Hamburg'}      
+      city: {type: string, default: 'Hamburg'}
     command: "python train_weathernet.py {city}"

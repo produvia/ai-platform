@@ -1,4 +1,5 @@
 # Time Series Forecasting
+
 ## Weathernet
 
 Weathernet is a simple LSTM time series forecasting network to predict the temperature of the next day, based on the previous 32 days. Currently it supports only max temperature but can be easily extended to other parameters (e.g. pressure, humidity, etc.)
@@ -12,12 +13,12 @@ This example is using the data from the Hamburg station (1951 until 2018)
 
 ## LSTM Network
 
-The LSTM network is a keras functional model and has 4 Layers (1 Input, 2 LSTM and 1 Dense) and currently supports univariate time-series prediction but could easily be extended to multivariate time-series. 
+The LSTM network is a keras functional model and has 4 Layers (1 Input, 2 LSTM and 1 Dense) and currently supports univariate time-series prediction but could easily be extended to multivariate time-series.
 
 
 Layer (type)                 Output Shape              Param #
 
-seq_input (InputLayer)       (1, 32, 1)                0 
+seq_input (InputLayer)       (1, 32, 1)                0
 
 cu_dnnlstm_1 (CuDNNLSTM)     (1, 32, 100)              41200
 
@@ -32,7 +33,7 @@ Non-trainable params: 0
 
 ## Usage
 
-Project is using MLflow and has two entry-points. 
+Project is using MLflow and has two entry-points.
 Tensorflow backend is used for training - duration 15s/epoch on GTX1080
 
 ### Training only
@@ -48,19 +49,15 @@ Currently as an example Hamburg is supported as CITY.
 ## MLFlow
 
 Added logging of mlflow metrics and parameters as well as artifacts (loss curves, predictions vs. ground truth)
-Start MLflow UI from the command line after training/predicting with: 
+Start MLflow UI from the command line after training/predicting with:
 ```bash
 mlflow ui
 ```
 In browser enter:
 ```bash
 localhost:5000
-``` 
+```
 
 ## Todo
 - Create multistep workflow
 - Finetune model to catch better on outliers in time-series
-
-
-
-
