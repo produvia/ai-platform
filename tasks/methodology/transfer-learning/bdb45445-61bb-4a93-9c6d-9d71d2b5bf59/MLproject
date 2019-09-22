@@ -1,0 +1,13 @@
+name: transfer-learning
+
+conda_env: conda.yaml
+
+entry_points:
+  main:
+    parameters:
+      samples_per_class: {type: integer, default: 300}
+      retrained_conv_layers: {type: integer, default: 0}
+      use_early_stop: {type: integer, default: 1}
+      max_epochs: {type: integer, default: 20}
+
+    command: "python transfer_learning.py {samples_per_class} {retrained_conv_layers} {use_early_stop} {max_epochs}"
