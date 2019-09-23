@@ -13,6 +13,7 @@ Tasks sorted by title:
 - Instance Segmentation
 - Object Detection
 - Pose Estimation
+- Scene Text Detection
 - Semantic Segmentation
 - Style Transfer
 - Super Resolution

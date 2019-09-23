@@ -1,0 +1,3 @@
+name: scene-text-detection
+
+conda_env: conda.yaml
