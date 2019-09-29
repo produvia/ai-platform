@@ -7,6 +7,8 @@ Tasks sorted by title:
 - Depth Estimation
 - Domain Adaptation
 - Face Generation
+- Hyperspectral Image Classification
+- Hyperspectral Semantic Segmentation
 - Image Classification
 - Image Generation
 - Image Retrieval
