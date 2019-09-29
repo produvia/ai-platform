@@ -1,6 +1,6 @@
 # Methodology Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Anomaly Detection
 - Automated Feature Engineering

@@ -1,6 +1,6 @@
 # Computer Vision Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Autonomous Vehicles
 - Denoising

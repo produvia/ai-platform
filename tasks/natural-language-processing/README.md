@@ -1,6 +1,6 @@
 # Natural Language Processing Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Dependency Parsing
 - Entity Extraction

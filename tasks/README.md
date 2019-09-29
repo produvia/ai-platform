@@ -1,6 +1,6 @@
 # Computer Science Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Audio
 - Computer Vision

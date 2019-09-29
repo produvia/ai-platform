@@ -1,6 +1,6 @@
 # Time Series Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Spacio-Temporal Forecasting
 - Time Series Analysis

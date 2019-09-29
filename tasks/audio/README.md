@@ -1,6 +1,6 @@
 # Audio Tasks
 
-Tasks sorted by title:
+Task list, sorted by name:
 
 - Acoustic Scene Classification
 - Audio Classification
