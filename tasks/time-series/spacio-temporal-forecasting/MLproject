@@ -1,0 +1,3 @@
+name: spacio-temporal-forecasting
+
+conda_env: conda.yaml

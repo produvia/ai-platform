@@ -1,8 +1,21 @@
 # Computer Vision Tasks
 
-1. Semantic Segmentation
-2. Image Classification
-3. Object Detection
-4. Image Generation
-5. Denoising
-6. Super Resolution
+Task list, sorted by name:
+
+- Autonomous Vehicles
+- Denoising
+- Depth Estimation
+- Domain Adaptation
+- Face Generation
+- Hyperspectral Image Classification
+- Hyperspectral Semantic Segmentation
+- Image Classification
+- Image Generation
+- Image Retrieval
+- Instance Segmentation
+- Object Detection
+- Pose Estimation
+- Scene Text Detection
+- Semantic Segmentation
+- Style Transfer
+- Super Resolution

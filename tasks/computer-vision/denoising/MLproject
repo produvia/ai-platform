@@ -1,0 +1,3 @@
+name: denoising
+
+conda_env: conda.yaml

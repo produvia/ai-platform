@@ -1,7 +1,10 @@
 # Time Series Tasks
 
-1. Time Series Classification
-2. Time Series Analysis
-3. Time Series Forecasting
-4. Time Series Prediction
-5. Spacio-Temporal Forecasting
+Task list, sorted by name:
+
+- Spacio-Temporal Forecasting
+- Time Series Analysis
+- Time Series Classification
+- Time Series Clustering
+- Time Series Forecasting
+- Time Series Prediction

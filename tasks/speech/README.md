@@ -1,7 +1,9 @@
 # Speech Tasks
 
-1. Speech Recognition
-2. Speech Emotion Recognition
-3. Speech Synthesis
-4. Speaker Verification
-5. Keyword Spotting
+Task list, sorted by name:
+
+- Keyword Spotting
+- Speaker Verification
+- Speech Emotion Recognition
+- Speech Recognition
+- Speech Synthesis

@@ -1,7 +1,21 @@
 # Natural Language Processing Tasks
 
-1. Machine Translation
-2. Language Modelling
-3. Question Answering
-4. Sentiment Analysis
-5. Text Classification
+Task list, sorted by name:
+
+- Dependency Parsing
+- Entity Extraction
+- Image Captioning
+- Information Retrieval
+- Intent Classification
+- Language Modeling
+- Machine Translation
+- Named Entity Recognition
+- Natural Language Inference
+- Question Answering
+- Reading Comprehension
+- Relation Extraction
+- Semantic Textual Similarity
+- Sentiment Analysis
+- Text Classification
+- Text Generation
+- Text Summarization

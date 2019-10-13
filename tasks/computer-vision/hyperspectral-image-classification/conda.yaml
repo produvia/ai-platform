@@ -1,0 +1,3 @@
+name: hyperspectral-image-classification
+channels:
+  - defaults

@@ -1,0 +1,3 @@
+name: anomaly-detection
+
+conda_env: conda.yaml

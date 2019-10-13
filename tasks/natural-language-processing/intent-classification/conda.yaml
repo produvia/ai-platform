@@ -1,0 +1,3 @@
+name: intent-classification
+channels:
+  - defaults

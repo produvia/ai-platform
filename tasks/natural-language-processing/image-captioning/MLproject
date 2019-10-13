@@ -1,0 +1,3 @@
+name: image-captioning
+
+conda_env: conda.yaml

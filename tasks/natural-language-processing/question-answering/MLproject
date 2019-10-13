@@ -1,0 +1,3 @@
+name: question-answering
+
+conda_env: conda.yaml

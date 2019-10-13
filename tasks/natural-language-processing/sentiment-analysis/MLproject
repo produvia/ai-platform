@@ -1,0 +1,3 @@
+name: sentiment-analysis
+
+conda_env: conda.yaml

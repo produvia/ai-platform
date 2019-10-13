@@ -1,7 +1,10 @@
 # Audio Tasks
 
-1. Audio Generation
-2. Audio Classification
-3. Sound Event Detection
-4. Acoustic Scene Classification
-5. Audio Tagging
+Task list, sorted by name:
+
+- Acoustic Scene Classification
+- Audio Classification
+- Audio Generation
+- Audio Tagging
+- Music Generation
+- Sound Event Detection
