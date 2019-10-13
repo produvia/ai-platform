@@ -1,4 +1,5 @@
 """Trains and evaluates a simple CNN for object classification on the CIFAR10 dataset"""
+import argparse
 
 import keras
 import mlflow.keras
@@ -133,6 +134,16 @@ def show_images(x, correct, predicted):
 	pyplot.show()
 
 
+# Command-line arguments
+parser = argparse.ArgumentParser()
+parser.add_argument('--batch-size', type=int, default=64,
+                    help='input batch size for training')
+parser.add_argument('--epochs', type=int, default=20,
+                    help='number of epochs to train. 150 should get you to ~85% accuracy')
+parser.add_argument('--augment', type=bool, default=True,
+                    help='Do image augmentation for training?')
+args = parser.parse_args()
+
 # Automatically log metrics and parameters to MLflow.
 mlflow.keras.autolog()
 
@@ -142,7 +153,7 @@ num_classes = y_train.shape[1]
 
 model = build_model(num_classes, input_shape)
 model.summary()
-train(model, batch_size=64, epochs=20, augment=True)  # 150 epochs should achieve ~85% accuracy in the validation set
+train(model, args.batch_size, args.epochs, args.augment)  # 150 epochs should achieve ~85% accuracy in the validation set
 
 y_pred = np.argmax(model.predict(x_test, verbose=2), axis=1)
 
