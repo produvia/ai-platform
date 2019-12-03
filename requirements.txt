@@ -25,7 +25,7 @@ protobuf==3.11.0
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytz==2019.3
-pyyaml==5.1.2
+pyyaml==5.2
 querystring-parser==1.2.4
 requests==2.22.0
 simplejson==3.17.0
