@@ -21,7 +21,7 @@ markupsafe==1.1.1
 mlflow==1.4.0
 numpy==1.17.4
 pandas==0.25.3
-protobuf==3.11.0
+protobuf==3.11.1
 python-dateutil==2.8.1
 python-editor==1.0.4
 pytz==2019.3
