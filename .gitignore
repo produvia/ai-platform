@@ -6,3 +6,4 @@ __pycache__/
 *.jpg
 *.jpeg
 *.png
+*.csv
