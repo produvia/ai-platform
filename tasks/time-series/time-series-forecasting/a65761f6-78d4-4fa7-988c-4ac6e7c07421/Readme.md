@@ -1,3 +1,5 @@
+AI-Platform Task UUID: `a65761f6-78d4-4fa7-988c-4ac6e7c07421`
+
 # Project Description
 
 Irish electricity consumption forecasting for the next 7-days using XGBoost.
