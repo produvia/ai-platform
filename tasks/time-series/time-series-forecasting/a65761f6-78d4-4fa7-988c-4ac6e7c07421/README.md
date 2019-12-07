@@ -20,7 +20,7 @@ Source : [data.gov.ie](https://data.gov.ie/dataset/energy-consumption-gas-and-el
 **Running Example**
 
 ```
-$ cd tasks/time-series/time-series-forecasting/XGB/src/
+$ cd tasks/time-series/time-series-forecasting/a65761f6-78d4-4fa7-988c-4ac6e7c07421/src/
 
 $ mlflow run .
 ```
