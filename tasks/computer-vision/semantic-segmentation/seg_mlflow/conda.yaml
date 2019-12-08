@@ -1,16 +1,14 @@
 name: segmentation
 channels:
-  - rdkit
   - defaults
 dependencies:
-  - python==3.6
+  - python
   - numpy
   - pandas
-  - glob
+  - glob2
   - tensorflow-mkl
   - matplotlib
-  - opencv-python
+  - opencv
   - scikit-learn
   - keras
-  - pip:
-    - mlflow>=1.0
+  - mlflow
