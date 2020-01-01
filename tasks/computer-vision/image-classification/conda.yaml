@@ -1,0 +1,18 @@
+name: image-classification
+channels:
+  - defaults
+dependencies:
+  - nomkl
+  - python=3.6
+  - numpy=1.16.4
+  - pip
+  - pip:
+    - keras>=2.2.4
+    - matplotlib>=3.1.0
+    - mlflow>=1.0
+    - pandas
+    - seaborn
+    - sklearn
+    - tensorflow>=1.13.1
+    - urllib3
+
