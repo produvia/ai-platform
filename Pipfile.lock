@@ -20,7 +20,6 @@
             "hashes": [
                 "sha256:791a5686953c4b366d3228c5377196db2f534475bb38d26f70eb69668efd9028"
             ],
-            "index": "pypi",
             "version": "==1.4.1"
         },
         "certifi": {
@@ -182,11 +181,11 @@
         },
         "mlflow": {
             "hashes": [
-                "sha256:0070b0a3b12c691affcc3d48855b9765f149823025315f583b6b33dda3e17f28",
-                "sha256:87c493aeed3a90d324d9acefe480b3edc121fc9aa1a40d0116fea7275b74f573"
+                "sha256:1fdc53758d127b6041f6729d06459b35cfd4c9186810c5bfceb2d5a202b2c911",
+                "sha256:e70cbfa71e5e89562598a4a36eea8dc34823ad642a6cf04efd50cdf14656b061"
             ],
             "index": "pypi",
-            "version": "==1.6.0"
+            "version": "==1.7.0"
         },
         "numpy": {
             "hashes": [
